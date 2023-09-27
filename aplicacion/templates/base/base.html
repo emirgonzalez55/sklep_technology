@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %} {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap@5.3.1.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary rounded border-bottom" aria-label="Eleventh navbar example">
+      <div class="container">
+        <a class="navbar-brand" href="/">Sklep Technology</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExample09">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </li>
+          </ul>
+          <form  class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" action="{% url 'buscar' %}" method="get">
+            <input class="form-control" type="search" name="buscar" placeholder="Search" aria-label="Search">
+          </form>
+          <div class="d-flex justify-content-center">
+          {% if request.user.is_authenticated %}
+            <div class="dropdown text-end">
+              <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside"  aria-expanded="false">
+                <img src="{% static 'img/login.png' %}" alt="mdo" width="32" height="32" class="rounded-circle">
+              </a>
+              <ul class="dropdown-menu text-small">
+                <li><a class="dropdown-item" href="#">Usuario: {{ request.user.usuario }}</a></li>
+                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/logout">Cerrar sesión</a></li>
+                <li class="">
+                  <button class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown" id="bd-theme" type="button" data-bs-toggle="dropdown" aria-expanded="false">Modo de color</button>      
+                  <ul class="dropdown-menu">
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">Light</button>
+                    </li>
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">Dark</button>
+                    </li>
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">Auto</button>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          {% else %}
+            <div class="text-end">
+              <a href="/login"><button type="button" class="btn btn-outline-primary me-2">Ingresar</button></a>
+              <a href="/registro"><button type="button" class="btn btn-primary">Crear cuenta</button></a>
+            </div>
+          {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+    {% block contenido %}
+    {% endblock %}  
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 border-top">
+      <div>
+        <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2023 Sklep Technology</span>
+      </div>
+      <div>
+        <span class="mb-3 mb-md-0 text-body-secondary">versión 0.0.1</span>
+      </div>
+    </footer>
+  </body>
+    <script src="{% static 'js/bootstrap@5.3.1.js' %}"></script>   
+    <script src="{% static 'js/modo_color_bootstrap.js' %}"></script>   
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>    
+    <script src="{% static 'js/productos.js' %}"></script>   
+</html>
+
+
+

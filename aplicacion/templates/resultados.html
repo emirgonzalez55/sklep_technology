@@ -1,0 +1,22 @@
+{% extends "base/base.html" %}
+{% block titulo %} Resultados {% endblock %}
+{% block contenido %}  
+
+{% if productos %}
+<div class="container">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3 y-3">
+{% for producto in productos %}
+        <div class="col">
+          <div class="card " style="max-width: 223px; max-height: 403px;">
+            <img src="{{ producto.imagen.url }}" alt="" width="100%" height="100%">
+            <div class="card-footer bg-transparent text-truncate">
+                <h6>{{ producto.producto_nombre }}</h6>
+                <span>$ {{ producto.precio_unitario }}</span>
+            </div>
+          </div>
+        </div>
+{% endfor %}
+    </div> 
+</div> 
+{% endif %}   
+{% endblock %}

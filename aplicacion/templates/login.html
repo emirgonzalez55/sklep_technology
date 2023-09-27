@@ -1,0 +1,22 @@
+{% extends "base/base.html" %}
+{% block titulo %} Login {% endblock %}
+{% block contenido %}  
+    <main class="form-signin w-100 m-auto">
+        <form method="POST">
+            <img class="mb-4" src="static/img/login.png" alt="" width="100" height="100">
+            <h1 class="h3 mb-3 fw-normal">Iniciar sesión</h1>
+        {% csrf_token %} 
+        {% for campo in form  %}
+          <div class="form-floating">
+            <input type="{{ campo.field.widget.input_type}}" name="{{ campo.name }}" class="form-control" id="floatingInput" placeholder="{{ campo.label}}">
+            <label for="floatingInput">{{ campo.label}}</label>
+          </div>
+          <div> {{campo.errors}}</div>
+        {% endfor %}
+        <button class="btn btn-primary w-100 py-2" type="submit">Iniciar sesion</button>
+        <div> {{form.non_field_errors}}</div>
+        </form>
+      </main>   
+{% endblock %}
+
+

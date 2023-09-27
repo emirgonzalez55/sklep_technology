@@ -1,0 +1,78 @@
+{% extends "base/base.html" %}
+{% block titulo %} Administrar productos {% endblock %}
+{% block contenido %}  
+<div class="d-flex  justify-content-center">
+  <button type="button" onclick="modal_producto('/administrar/productos/agregar_producto')" class="btn btn-primary">Agregar producto</button>
+</div>
+<div class="table-responsive" id="tabla-productos">
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Imagen</th>
+        <th scope="col">Producto nombre</th>
+        <th scope="col">Categoria</th>
+        <th scope="col">Precio unitario</th>
+        <th scope="col">Unidades en stock</th>
+        <th scope="col" colspan="2">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if productos %}    
+    {% for producto in productos %}
+      <tr>
+        <th scope="row">{{ producto.id_producto }}</th>
+        <td><img src="{{ producto.imagen.url }}" alt="" width="100px" height="100px"></td>
+        <td>{{ producto.producto_nombre }}</td>
+        <td>{{ producto.categoria }}</td>
+        <td>{{ producto.precio_unitario }}</td>
+        <td>{{ producto.unidades_stock }}</td>
+        <td><button type="button" onclick="modal_producto('/administrar/productos/editar_producto/{{ producto.id_producto }}')" class="btn btn-secondary">Editar</button></td>
+        {% if perms.aplicacion.delete_productos %}  
+        <td><button type="button" onclick="modal_producto('/administrar/productos/eliminar_producto/{{ producto.id_producto }}')" class="btn btn-danger">Eliminar</button></td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    {% endif %}  
+    </tbody>
+  </table>
+</div>  
+{% if is_paginated %}
+<nav>
+    <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number}}">Anterior</a></li>
+    {% else %}
+      <li class="page-item disabled"><a class="page-link" href="">Anterior</a></li>
+    {% endif %}  
+    {% for page in paginator.page_range %}
+            <li class="page-item {% if page_obj.number == page %} active {% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number}}">Siguiente</a></li>
+    {% else %}
+      <li class="page-item disabled"><a class="page-link" href="">Siguiente</a></li>
+    {% endif %}
+    </ul>
+</nav>
+{% endif %}  
+
+<div class="modal fade" id="modal-producto"></div>
+<div class="modal fade" id="modal-aviso">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="titulo-aviso"></h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="body-aviso"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

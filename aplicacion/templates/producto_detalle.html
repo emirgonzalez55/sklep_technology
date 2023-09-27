@@ -1,0 +1,41 @@
+{% extends "base/base.html" %}
+{% block titulo %} {{ producto.producto_nombre }} {% endblock %}
+{% block contenido %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card mb-3">
+                <div class="row g-0 row-cols-1 row-cols-sm-1 row-cols-md-3 ">
+                    <div class="col">
+                        <img src="{{ producto.imagen.url }}" class="img-fluid rounded-start" alt="" width="100%" height="100%">
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                        <h4 class="card-title">{{ producto.producto_nombre }}</h4>
+                        <p class="card-text">$ {{ producto.precio_unitario }}</p>
+                        <p class="card-text">Categoría: {{ producto.categoria }}</p>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                        <h5 class="card-title">Unidades en stock: {{ producto.unidades_stock }}</h5>
+                        <div><button type="button" class="btn btn-primary">Comprar</button></div>
+                        <div><button type="button" class="btn btn-outline-primary">Agregar al carrito</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Descripción</h5>
+                  <p class="card-text"> {{ producto.descripcion }}</p>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
