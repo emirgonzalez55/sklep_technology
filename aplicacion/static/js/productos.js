@@ -19,12 +19,13 @@ function form_productos(){
     });
 }
 function error_form(errores){
-    $("#producto_nombre").html("");
-    $("#categoria").html("");
-    $("#precio_unitario").html("");
-    $("#unidades_stock").html("");
-    $("#descripcion").html("");
-    $("#imagen").html("");
+    $("#producto_nombre").empty();
+    $("#categoria").empty();
+    $("#marca").empty();
+    $("#precio_unitario").empty();
+    $("#unidades_stock").empty();
+    $("#descripcion").empty();
+    $("#imagen").empty();
     let error = "";
     for (let item in errores.responseJSON.error){
         error = '<p>' + errores.responseJSON.error[item] + '</p>';
@@ -34,10 +35,11 @@ function error_form(errores){
 }
 function cerrar_modal(){
     $("#modal-producto").modal("hide");
+    $("#modal-producto").empty();
   }
 function modal_aviso(mensaje,producto){
-    $("#titulo-aviso").html("");
-    $("#body-aviso").html("");
+    $("#titulo-aviso").empty();
+    $("#body-aviso").empty();
     $("#modal-aviso").modal("show");	
     $("#titulo-aviso").append(mensaje); 
     $("#body-aviso").append(producto); 

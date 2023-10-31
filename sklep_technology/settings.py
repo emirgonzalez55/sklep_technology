@@ -128,7 +128,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'aplicacion.Usuarios'
+AUTH_USER_MODEL = 'aplicacion.Usuario'
 
 MEDIA_URL = 'aplicacion/static/img/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'aplicacion/static/img/')

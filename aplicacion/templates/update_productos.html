@@ -7,10 +7,14 @@
     <form method="POST" id="form-producto" action="{% url 'editar_producto' object.id_producto %}" enctype="multipart/form-data"> 
       {% csrf_token %}
     <div class="modal-body form-product">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4">
-        <div class="col">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3">
+        <div class="col col-sm-12 col-md-12 col-lg-8">
           {{form.producto_nombre}}
           <div id="producto_nombre"></div>
+        </div>
+        <div class="col">
+          {{form.marca}}
+          <div id="marca"></div>
         </div>
         <div class="col">
           {{form.categoria}}

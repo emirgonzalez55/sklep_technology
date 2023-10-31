@@ -37,8 +37,8 @@
               </ul>
             </li>
           </ul>
-          <form  class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" action="{% url 'buscar' %}" method="get">
-            <input class="form-control" type="search" name="buscar" placeholder="Search" aria-label="Search">
+          <form  class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="Buscar" action="{% url 'buscar' %}" method="get">
+            <input class="form-control" type="search" name="buscar" placeholder="Buscar" aria-label="Buscar">
           </form>
           <div class="d-flex justify-content-center">
           {% if request.user.is_authenticated %}
@@ -93,6 +93,7 @@
     <script src="{% static 'js/modo_color_bootstrap.js' %}"></script>   
     <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>    
     <script src="{% static 'js/productos.js' %}"></script>   
+    <script src="{% static 'js/comprar.js' %}"></script>   
 </html>
 
 
