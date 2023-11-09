@@ -3,6 +3,7 @@ from django.db.models.signals import pre_save
 from django.utils.text import slugify
 from django.contrib.auth.models import  AbstractBaseUser,UserManager,PermissionsMixin,Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 import mercadopago
 # Create your models here.
 
@@ -126,6 +127,24 @@ class Producto(models.Model):
             actualizar_stock = False
             
         return actualizar_stock
+    
+    def buscar_productos(**kwargs):
+        if kwargs:
+            borrar_keys = []
+            for key, value in kwargs.items():
+                if not value:
+                    borrar_keys.append(key)
+            for key in borrar_keys:
+                del kwargs[key]
+            try:
+                resultados = Producto.objects.filter(**kwargs)
+                resultados.categorias = resultados.values("categoria__categoria_nombre").annotate(cantidad=Count("categoria")).order_by("-cantidad")
+                resultados.marcas = resultados.values("marca__marca_nombre").annotate(cantidad=Count("marca")).order_by("-cantidad")
+                resultados.cantidad_resultados = resultados.count()
+            except:
+                resultados = None
+
+            return resultados
 
 pre_save.connect(Producto.crear_slug, sender=Producto)
 
