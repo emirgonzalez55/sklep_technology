@@ -2,42 +2,87 @@
 {% block titulo %} Resultados {% endblock %}
 {% block contenido %}  
 
-{% if productos %}
-<div class="container">
-  <!-- {% if not productos.categoria %}
-  {% for categoria in productos.categorias %}
-  {% if not productos.marca %}
-  <a href="/buscar?buscar={{ productos.consulta }}&categoria={{ categoria }}">{{ categoria }}</a>
-  {% else %}
 
-  <a href="/buscar?buscar={{ productos.consulta }}&marca={{ productos.marca }}&categoria={{ categoria }}">{{ categoria }}</a>
-  {% endif %}
-  {% endfor %}
-  {% else %}
-  <span class="badge bg-secondary">{{productos.categoria}} <a href="/buscar?buscar={{ productos.consulta }}"><span aria-hidden="true">&times;</a></span></span>
-  {% endif %}
-  
-  {% if not productos.marca %}
-  {% for marca in productos.marcas %}
-  {% if not productos.categoria %}
-  <a href="/buscar?buscar={{ productos.consulta }}&marca={{ marca }}">{{ marca }}</a>
-  {% else %}
-  <a href="/buscar?buscar={{ productos.consulta }}&categoria={{ productos.categoria }}&marca={{ marca }}">{{ marca }}</a>
-  {% endif %}
-  {% endfor %}
-  {% endif %} -->
-  <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 my-2">
-    {% for producto in productos %}
-    <div class="col my-1">
-      <div class="card" style="max-width: 223px; max-height: 403px;">
-        <img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100%">
-        <div class="card-footer bg-transparent">
-          <h6 class="text-truncate">{{ producto.producto_nombre }}</h6>
-          <span class="text-truncate">$ {{ producto.precio_unitario }}</span>
+{% if productos %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-3 col-lg-2 ">
+      <p class="fw-bold">Búsqueda: {{ productos.consulta }}</p>
+      <span class="">{{ productos.cantidad_resultados }} resultados</span>
+      <p class="fw-bold">Flitros</p>
+      <div class="my-1">
+      {% if productos.precio_min %}
+      <button type="button" class="badge bg-secondary" name="precio_min" onclick="filtro_busqueda(event)">Apartir de $ {{ productos.precio_min}} &times;</button>
+      {% endif %}
+      {% if productos.precio_max %}
+      <button type="button" class="badge bg-secondary" name="precio_max" onclick="filtro_busqueda(event)">Hasta $ {{ productos.precio_max}} &times;</button>
+      {% endif %}
+      {% if productos.categoria %}
+      <button type="button" class="badge bg-secondary" name="categoria" onclick="filtro_busqueda(event)">{{ productos.categoria}} &times;</button>
+      {% endif %}
+      {% if productos.marca %}
+      <button type="button" class="badge bg-secondary" name="marca" onclick="filtro_busqueda(event)">{{ productos.marca}} &times;</button>
+      {% endif %}
+      </div>
+      {% if not productos.categoria %}
+      <select class="form-select form-select-sm" id="categorias" name="categoria" onchange="filtro_busqueda(event)">
+        <option value selected>Categorias</option>
+        {% for categoria in productos.categorias %}
+        <option value="{{categoria.categoria__categoria_nombre}}">{{categoria.categoria__categoria_nombre}} ({{categoria.cantidad}})</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+      {% if not productos.marca %}
+      <select class="form-select form-select-sm" id="marcas" name="marca" onchange="filtro_busqueda(event)">
+        <option value selected>Marcas</option>
+        {% for marca in productos.marcas %}
+        <option value="{{marca.marca__marca_nombre}}">{{marca.marca__marca_nombre}} ({{marca.cantidad}})</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+      {% if not productos.precio_min and not productos.precio_max %}
+      <form id="filtro-precio" onsubmit="filtro_busqueda(event)">
+      <div class="row">
+        <p class="fw-bold">Precio</p>
+        <div class="col-6">
+          <input class="form-control form-control-sm" name="precio_min" min="0" type="number" placeholder="min">
+        </div>
+        <div class="col-6">
+          <input class="form-control form-control-sm" name="precio_max" type="number" placeholder="max">
+        </div>
+        <div class="col-12 d-grid gap-2 my-1">
+          <button type="submit" class="btn btn-primary btn-sm">Aplicar</button>
         </div>
       </div>
+    </form>
+    {% endif %}
     </div>
-    {% endfor %}
+    <div class="col-10 col-md-9 col-lg-10 container">
+      <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 my-2">
+        {% for producto in productos %}
+        <div class="col my-1">
+          <a href="{% url 'producto_detalle' producto.slug %}" class="text-decoration-none">
+          <div class="card" style="max-width: 223px; max-height: 403px;">
+            <img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100%">
+            <div class="card-footer bg-transparent">
+              <h6 class="text-truncate">{{ producto.producto_nombre }}</h6>
+              <span class="text-truncate">$ {{ producto.precio_unitario }}</span>
+            </div>
+          </div>
+        </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container">
+  <div class="d-flex justify-content-center">
+    <img class="img-fluid" src="static/img/buscar.png" alt="" width="200">
+  </div>
+  <div class="d-flex justify-content-center">
+    <h3>No se encontraron productos que coincidan con tu búsqueda</h3>
   </div>
 </div>
 {% endif %}
