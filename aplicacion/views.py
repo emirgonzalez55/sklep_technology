@@ -8,7 +8,6 @@ from .models import Usuario, Producto,Tarjeta,Pedido,CarritoCompra,Mercado,Produ
 from django.contrib.auth.views import LoginView,LogoutView
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView,TemplateView,DetailView,View
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Q
 from django.urls import reverse_lazy
 
 # Create your views here.
@@ -58,23 +57,31 @@ class DetalleProductoVista(DetailView):
             context["cantidad_select"] = range(1, context["producto"].unidades_stock + 1)
             
         return context
-        
+  
 class BuscarProductosVista(ListView):
     template_name = "resultados.html"
-    model = Producto
     context_object_name = "productos"
     def get_queryset(self):
         if self.request.GET.get('buscar'):
             consulta = self.request.GET.get('buscar')
             categoria = self.request.GET.get('categoria')
             marca = self.request.GET.get('marca')
-            queryset = Producto.objects.filter(Q(producto_nombre__icontains=consulta) | Q(categoria__categoria_nombre__icontains=consulta))
+            precio_min = self.request.GET.get('precio_min')
+            precio_max = self.request.GET.get('precio_max')
+            precio_rango = None
+            # if precio_min and precio_max:
+            #     precio_rango = tuple(sorted((precio_min, precio_max)))
+            #     print(tuple(sorted((precio_min, precio_max))))
+            #     precio_min = None
+            #     precio_max = None
+
+            queryset = Producto.buscar_productos(producto_nombre__icontains=consulta,categoria__categoria_nombre=categoria,marca__marca_nombre=marca,precio_unitario__range=precio_rango,precio_unitario__gte=precio_min,precio_unitario__lte=precio_max)
             queryset.consulta = consulta
             queryset.categoria = categoria
             queryset.marca = marca
-
-            queryset.categorias = ProductoCategoria.objects.all()
-            queryset.marcas = ProductoMarca.objects.all()
+            queryset.precio_min = precio_min
+            queryset.precio_max = precio_max
+            # queryset.precio_rango = precio_rango
             return queryset
 
 class AdministrarProductosVista(PermissionRequiredMixin,ListView):
