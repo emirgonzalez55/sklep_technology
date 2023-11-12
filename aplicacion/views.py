@@ -3,8 +3,8 @@ from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib import messages
-from .forms import RegistroForm, LoginForm, ProductForm,PagoForm
-from .models import Usuario, Producto,Tarjeta,Pedido,CarritoCompra,Mercado,ProductoCategoria,ProductoMarca
+from aplicacion.forms import RegistroForm, LoginForm, ProductForm,PagoForm
+from aplicacion.models import Usuario, Producto,Tarjeta,Pedido,CarritoCompra,Mercado,ProductoCategoria,ProductoMarca
 from django.contrib.auth.views import LoginView,LogoutView
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView,TemplateView,DetailView,View
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -38,15 +38,25 @@ class RegistroVista(CreateView):
 
 class LoguutVista(LogoutView):
     next_page ="inicio"
-    
 
 class ProductosVista(ListView):
     template_name = "productos.html"
     model = Producto
     context_object_name = "productos"
     queryset = Producto.objects.all()
-    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.kwargs:
+            filtro = self.kwargs["filtro"]
+            valor = self.kwargs["valor"]
 
+            if filtro == "categoria":
+                queryset = queryset.filter(categoria__categoria_nombre=valor)
+            if filtro == "marca":
+                queryset = queryset.filter(marca__marca_nombre=valor)
+
+        return queryset
+    
 class DetalleProductoVista(DetailView):
     template_name = "producto_detalle.html"
     model = Producto
