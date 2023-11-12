@@ -15,7 +15,9 @@ function filtro_busqueda(event) {
         var id = event.target.getAttribute("id")
         var inputs = document.querySelectorAll("#"+id+" input");
         inputs.forEach(element => {
-            url.searchParams.set(element.name,element.value) 
+            if (element.value.length != 0) {
+                url.searchParams.set(element.name,element.value) 
+            }
         });
     }
     window.location.href = url
