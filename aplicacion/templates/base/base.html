@@ -29,7 +29,7 @@
               <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Categorias</a>
               <ul class="dropdown-menu">
                 {% for categoria in categorias %}
-                <li><a class="dropdown-item" href="{% url 'productos_filtro' 'categoria' categoria %}">{{ categoria }}</a></li>
+                <li><a class="dropdown-item" href="{% url 'productos_filtro' 'categoria' categoria.slug %}">{{ categoria }}</a></li>
                 {% endfor %}
               </ul>
             </li>
@@ -37,7 +37,7 @@
               <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Marcas</a>
               <ul class="dropdown-menu">
                 {% for marca in marcas %}
-                <li><a class="dropdown-item" href="{% url 'productos_filtro' 'marca' marca %}">{{ marca }}</a></li>
+                <li><a class="dropdown-item" href="{% url 'productos_filtro' 'marca' marca.slug %}">{{ marca }}</a></li>
                 {% endfor %}
               </ul>
             </li>
