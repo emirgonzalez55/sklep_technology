@@ -51,9 +51,9 @@ class ProductosVista(ListView):
             valor = self.kwargs["valor"]
 
             if filtro == "categoria":
-                queryset = queryset.filter(categoria__categoria_nombre=valor)
+                queryset = queryset.filter(categoria__slug=valor)
             if filtro == "marca":
-                queryset = queryset.filter(marca__marca_nombre=valor)
+                queryset = queryset.filter(marca__slug=valor)
 
         return queryset
     
