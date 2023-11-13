@@ -18,17 +18,17 @@
       <button type="button" class="badge bg-secondary" name="precio_max" onclick="filtro_busqueda(event)">Hasta $ {{ productos.precio_max}} &times;</button>
       {% endif %}
       {% if productos.categoria %}
-      <button type="button" class="badge bg-secondary" name="categoria" onclick="filtro_busqueda(event)">{{ productos.categoria}} &times;</button>
+      <button type="button" class="badge bg-secondary" name="categoria" onclick="filtro_busqueda(event)">{{ productos.categorias.0.categoria__categoria_nombre }} &times;</button>
       {% endif %}
       {% if productos.marca %}
-      <button type="button" class="badge bg-secondary" name="marca" onclick="filtro_busqueda(event)">{{ productos.marca}} &times;</button>
+      <button type="button" class="badge bg-secondary" name="marca" onclick="filtro_busqueda(event)">{{ productos.marcas.0.marca__marca_nombre}} &times;</button>
       {% endif %}
       </div>
       {% if not productos.categoria %}
       <select class="form-select form-select-sm" id="categorias" name="categoria" onchange="filtro_busqueda(event)">
         <option value selected>Categorias</option>
         {% for categoria in productos.categorias %}
-        <option value="{{categoria.categoria__categoria_nombre}}">{{categoria.categoria__categoria_nombre}} ({{categoria.cantidad}})</option>
+        <option value="{{categoria.categoria__slug}}">{{categoria.categoria__categoria_nombre}} ({{categoria.cantidad}})</option>
         {% endfor %}
       </select>
       {% endif %}
@@ -36,7 +36,7 @@
       <select class="form-select form-select-sm" id="marcas" name="marca" onchange="filtro_busqueda(event)">
         <option value selected>Marcas</option>
         {% for marca in productos.marcas %}
-        <option value="{{marca.marca__marca_nombre}}">{{marca.marca__marca_nombre}} ({{marca.cantidad}})</option>
+        <option value="{{marca.marca__slug}}">{{marca.marca__marca_nombre}} ({{marca.cantidad}})</option>
         {% endfor %}
       </select>
       {% endif %}
