@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.utils.text import slugify
 from django.contrib.auth.models import  AbstractBaseUser,UserManager,PermissionsMixin,Group
 from django.core.exceptions import ObjectDoesNotExist
@@ -47,8 +48,9 @@ class Usuario(AbstractBaseUser,PermissionsMixin):
 
 class ProductoCategoria(models.Model):
     id_categoria = models.AutoField(primary_key=True)
-    categoria_nombre = models.CharField(max_length=16,unique=True)
+    categoria_nombre = models.CharField(max_length=32,unique=True)
     categoria_descripcion = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=32, unique=True, blank=True)
 
     class Meta:
         verbose_name = "Categoria"
@@ -61,7 +63,9 @@ class ProductoCategoria(models.Model):
 
 class ProductoMarca(models.Model):
     id_marca = models.AutoField(primary_key=True)
-    marca_nombre = models.CharField(max_length=16,unique=True)
+    marca_nombre = models.CharField(max_length=32,unique=True)
+    marca_descripcion = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=32, unique=True, blank=True)
 
     class Meta:
         verbose_name = "Marca"
@@ -89,9 +93,6 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.producto_nombre
-
-    def crear_slug(sender, instance,*args,**kwargs):
-        instance.slug = slugify(instance.producto_nombre)
 
     def obtener_producto(**kwargs):
         try:
@@ -138,15 +139,13 @@ class Producto(models.Model):
                 del kwargs[key]
             try:
                 resultados = Producto.objects.filter(**kwargs)
-                resultados.categorias = resultados.values("categoria__categoria_nombre").annotate(cantidad=Count("categoria")).order_by("-cantidad")
-                resultados.marcas = resultados.values("marca__marca_nombre").annotate(cantidad=Count("marca")).order_by("-cantidad")
+                resultados.categorias = resultados.values("categoria__categoria_nombre","categoria__slug").annotate(cantidad=Count("categoria")).order_by("-cantidad")
+                resultados.marcas = resultados.values("marca__marca_nombre","marca__slug").annotate(cantidad=Count("marca")).order_by("-cantidad")
                 resultados.cantidad_resultados = resultados.count()
             except:
                 resultados = None
 
             return resultados
-
-pre_save.connect(Producto.crear_slug, sender=Producto)
 
 class Pedido(models.Model):
     id_pedido = models.AutoField(primary_key=True)
@@ -335,3 +334,14 @@ class Mercado(models.Model):
         preference = preference_response["response"]
 
         return preference, public_token
+
+@receiver(pre_save)
+def crear_slug(sender, instance, **kwargs):
+    if sender == Producto:
+        instance.slug = slugify(instance.producto_nombre)
+
+    if sender == ProductoCategoria:
+        instance.slug = slugify(instance.categoria_nombre)
+
+    if sender == ProductoMarca:
+        instance.slug = slugify(instance.marca_nombre)
