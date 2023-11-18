@@ -26,6 +26,7 @@
           </div>
             <div class="col" style="max-width: 350px;">
               <form method="post">{% csrf_token %}
+                <input type="hidden" name="productos" value="{{ productos_lista }}">
               <div class="row">
                 <div class="col mt-1">
                   <label for="">Nombre del titular</label>
@@ -90,6 +91,7 @@
 <div class="container border rounded mt-2">
   <h3>Productos</h3>
   <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto border rounded align-items-center d-flex justify-content-between mb-1">
+    {% if producto %}
     <div class="col col-md-3 d-flex align-items-center">
       <img src="{{ producto.imagen.url}}" alt="" class="img-fluid m-1" width="100">
       <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
@@ -97,9 +99,22 @@
     <div class="col col-md-3">
       <p class="m-1">Cantidad: {{ cantidad }} / Precio unitario: $ {{producto.precio_unitario}}</p>
     </div>
+    {% endif %}
+    {% if carrito_compra %}
+    {% for carrito in  carrito_compra %}
+    {% if carrito.cantidad %}
+    <div class="col col-md-9 d-flex align-items-center">
+      <img src="{{ carrito.producto.imagen.url}}" alt="" class="img-fluid m-1" width="100">
+      <p class="text-truncate m-1">{{ carrito.producto.producto_nombre}}</p>
+    </div>
+    <div class="col col-md-3">
+      <p class="m-1">Cantidad: {{ carrito.cantidad }} / Precio unitario: $ {{carrito.producto.precio_unitario}}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
   </div>
 </div>
-
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
   const mp = new MercadoPago('{{ public_token }}'); 
