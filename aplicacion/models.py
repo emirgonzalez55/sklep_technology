@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from django.contrib.auth.models import  AbstractBaseUser,UserManager,PermissionsMixin,Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
+# from django.middleware import csrf
 import mercadopago
 # Create your models here.
 
@@ -95,37 +96,79 @@ class Producto(models.Model):
         return self.producto_nombre
 
     def obtener_producto(**kwargs):
-        try:
-            producto = Producto.objects.get(**kwargs)
-        except ObjectDoesNotExist:
-            producto = None
+        if "slug" in kwargs or "id_producto" in kwargs:
+            try:
+                producto = Producto.objects.get(**kwargs)
+            except ObjectDoesNotExist:
+                producto = None
+            return producto
+        
+        if "productos_lista" in kwargs:
+            productos_lista = kwargs["productos_lista"]
+            productos = []
+            for producto_lista in productos_lista:
+                try:
+                    producto = Producto.objects.get(id_producto = producto_lista["id_producto"])
+                    producto.cantidad = producto_lista["cantidad"]
+                    productos.append(producto)
+                except ObjectDoesNotExist:
+                    productos = None
+            return productos
 
-        return producto
     
-    def comprobar_stock(producto, cantidad):
-        producto = Producto.obtener_producto(id_producto=producto)
-        if producto:
-            if producto.unidades_stock >= cantidad:
-                comprobar_stock = True
+    def comprobar_stock(**kwargs):
+        if "producto" and "cantidad" in kwargs:
+            producto = kwargs["producto"]
+            cantidad = kwargs["cantidad"]
+            producto = Producto.obtener_producto(id_producto=producto)
+            if producto:
+                if producto.unidades_stock >= cantidad:
+                    comprobar_stock = True
+                else:
+                    comprobar_stock = False
             else:
                 comprobar_stock = False
-        else:
-            comprobar_stock = False
+
+        if "productos" in kwargs:
+            productos = kwargs["productos"]
+            for producto in productos:
+                if producto.unidades_stock >= producto.cantidad:
+                    comprobar_stock = True
+                else:
+                    comprobar_stock = False
+                    break
 
         return comprobar_stock
 
-    def actualizar_stock(producto_id, cantidad):
-        producto = Producto.obtener_producto(id_producto=producto_id)
-        if producto:
-            comprobar_stock = Producto.comprobar_stock(producto.id_producto, cantidad)
-            if comprobar_stock:
-                producto.unidades_stock = producto.unidades_stock - cantidad
-                producto.save()
-                actualizar_stock = True
+    def actualizar_stock(**kwargs):
+        if "producto" and "cantidad" in kwargs:
+            producto_id = kwargs["producto"]
+            cantidad = kwargs["cantidad"]
+            producto = Producto.obtener_producto(id_producto=producto_id)
+            if producto:
+                comprobar_stock = Producto.comprobar_stock(producto=producto.id_producto, cantidad=cantidad)
+                if comprobar_stock:
+                    producto.unidades_stock = producto.unidades_stock - cantidad
+                    producto.save()
+                    actualizar_stock = True
+                else:
+                    actualizar_stock = False
             else:
                 actualizar_stock = False
-        else:
-            actualizar_stock = False
+
+        if "productos" in kwargs:
+            productos = kwargs["productos"]
+            if productos:
+                comprobar_stock = Producto.comprobar_stock(productos=productos)
+                if comprobar_stock:
+                    for producto in productos:
+                        producto.unidades_stock = producto.unidades_stock - producto.cantidad
+                        producto.save()
+                        actualizar_stock = True
+                else:
+                    actualizar_stock = False
+            else:
+                actualizar_stock = False
             
         return actualizar_stock
     
@@ -175,6 +218,23 @@ class Pedido(models.Model):
                 if actualizar_stock:
                     pedido = True
         return pedido
+    
+    def procesar_parametro(productos):
+        productos_procesados = []
+        for producto in productos.split(","):
+            productos_procesados.append({ "id_producto": int(producto.split("-")[0]), "cantidad": int(producto.split("-")[1])})
+
+        return productos_procesados
+
+    def procesar_lista_productos(carrito_compra):
+        lista_productos = []
+        for carrito in carrito_compra:
+            if carrito.cantidad:
+                lista_productos.append(f"{carrito.producto.id_producto}-{carrito.cantidad}")
+       
+        productos = ",".join(lista_productos)
+        return productos
+      
 
 class PedidoDetalle(models.Model):
     id_pedido_detalle = models.AutoField(primary_key=True)
@@ -294,31 +354,35 @@ class Mercado(models.Model):
     private_access_token = models.CharField(max_length=255)
     public_access_token = models.CharField(max_length=255)
 
-    def generar_preference_mercadopago(**kwargs):
+    def generar_preference_mercadopago(usuario,**kwargs):
         tokens = Mercado.objects.get(id=1)
         public_token = tokens.public_access_token
         sdk = mercadopago.SDK(tokens.private_access_token)
+        # usuario = request.user.id_usuario
 
         if "producto" and "cantidad" in kwargs:
             producto = kwargs["producto"]
             cantidad = kwargs["cantidad"]
             preference_data = {
                 "items": [
-                    { "title": producto.producto_nombre,
+                    {"id": producto.id_producto,
+                     "title": producto.producto_nombre,
                      "quantity": cantidad,
                      "unit_price": float(producto.precio_unitario),
                      }
-                ]
+                ],"notification_url" : f"/comprar/mercadopago/{usuario}"
             }
 
         if "carrito" in kwargs:
-            carrito_compra = kwargs["carrito"][0]
+            carrito_compra = kwargs["carrito"]
             productos = []
             for carrito in carrito_compra:
-                productos.append({ "title": carrito.producto.producto_nombre ,"quantity": carrito.cantidad,"unit_price": float(carrito.producto.precio_unitario)})
+                if carrito.producto.unidades_stock:
+                    productos.append({ "id": carrito.producto.id_producto, "title": carrito.producto.producto_nombre ,"quantity": carrito.cantidad,"unit_price": float(carrito.producto.precio_unitario)})
 
             preference_data = {
-            "items": productos
+            "items": productos,
+            "notification_url" : f"/comprar/mercadopago/{usuario}"
             }
 
         # preference_data = {
@@ -334,7 +398,27 @@ class Mercado(models.Model):
         preference = preference_response["response"]
 
         return preference, public_token
+    
+    def procesar_respuesta_mp(type,data_id):
+        tokens = Mercado.objects.get(id=1)
+        sdk = mercadopago.SDK(tokens.private_access_token)
 
+        # if topic == "merchant_order":
+        #     merchant_order = sdk.merchant_order().get(id)           
+        #     print("Esto es merchant_order",merchant_order)
+        #     # for payment in merchant_order["payments"]:
+        #     #     print(payment['status'])
+
+        if type == "payment":
+            payment = sdk.payment().get(data_id)
+            status = payment["response"]["status"]
+            print("El estado de la operación es",status)
+            if status == "approved":
+                productos = payment["response"]["additional_info"]["items"]
+                for producto in productos:
+                    print(producto["id"])
+                    print(producto["title"])
+            
 @receiver(pre_save)
 def crear_slug(sender, instance, **kwargs):
     if sender == Producto:
