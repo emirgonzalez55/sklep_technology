@@ -1,7 +1,7 @@
 from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse,Http404
 from django.contrib import messages
 from aplicacion.forms import RegistroForm, LoginForm, ProductForm,PagoForm
 from aplicacion.models import Usuario, Producto,Tarjeta,Pedido,CarritoCompra,Mercado,ProductoCategoria,ProductoMarca
@@ -148,15 +148,22 @@ class EliminarProductoVista(PermissionRequiredMixin,DeleteView):
     success_url = reverse_lazy('administrar_productos')
 
 
-class CrearPedidoVista(View):
-
-    def get(self, request, producto_slug, cantidad):
+class ComprarVista(View):
+    def get(self, request,producto_slug,cantidad):
         form = PagoForm
         producto = Producto.obtener_producto(slug=producto_slug)
-        preference_mercadopago = Mercado.generar_preference_mercadopago(producto=producto,cantidad=cantidad)
-        total = producto.precio_unitario * cantidad
-        return render(request,'comprar.html', {'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1], 'producto': producto,'cantidad': cantidad,'total': total,'form': form})
-    def post(self, request, producto_slug, cantidad):
+        if producto and cantidad:
+            # comprobar_stock = Producto.comprobar_stock(producto.id_producto, cantidad)
+            usuario = request.user.id_usuario
+            preference_mercadopago = Mercado.generar_preference_mercadopago(usuario, producto=producto,cantidad=cantidad)
+            total = producto.precio_unitario * cantidad
+        
+            return render(request,'comprar.html', {'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1], 'producto': producto,'cantidad': cantidad,'total': total,'form': form})
+        
+
+        raise Http404("Producto no encontrado")
+
+    def post(self, request,producto_slug,cantidad):
         producto = Producto.obtener_producto(slug=producto_slug)
         form = PagoForm(request.POST or None)
         if form.is_valid():
@@ -168,7 +175,7 @@ class CrearPedidoVista(View):
                     print("Hay stock disponible")
                     crear_pedido = Pedido.crear_pedido(request, producto, cantidad)
                     if crear_pedido:
-                        print("Pedido creado correctamente")
+                            print("Pedido creado correctamente")
                     else:
                         print("Error al procesar pedido")
                 else: 
@@ -178,6 +185,53 @@ class CrearPedidoVista(View):
 
         return render(request,'comprar.html', {'producto': producto,'cantidad': cantidad,'form': form})
 
+class ComprarCarritoVista(View):
+
+
+    def get(self, request):
+        usuario = request.user.id_usuario
+        form = PagoForm
+        obtener_carrito = CarritoCompra.obtener_carrito(usuario)
+        carrito = obtener_carrito[0]
+        productos_lista = Pedido.procesar_lista_productos(carrito)
+        total = obtener_carrito[1]
+        preference_mercadopago = Mercado.generar_preference_mercadopago(usuario, carrito=carrito)
+        return render(request,'comprar.html', {'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1],'carrito_compra': carrito,'total': total,'form': form, 'productos_lista':productos_lista})
+    
+    def post(self, request):
+        parametro_productos = request.POST.get("productos")
+        productos_lista = Pedido.procesar_parametro(parametro_productos)
+        productos = Producto.obtener_producto(productos_lista=productos_lista)
+        productos1 = Producto.obtener_producto(slug="amd-ryzen-5-5950x")
+        # productos2 = Producto.obtener_producto(id_producto=1)
+        print("obtener_producto", productos)
+        print("obtener_producto", productos1)
+        # print("obtener_producto", productos2)
+        # comprobar_stock = Producto.comprobar_stock(productos=productos)
+        # comprobar_stock1 = Producto.comprobar_stock(producto=1, cantidad=1)
+        # actualizar_stock = Producto.actualizar_stock(producto=1, cantidad=1)
+        # print("actualizar_stock",actualizar_stock)
+        # actualizar_stock_v2 = Producto.actualizar_stock(productos=productos)
+        # print("actualizar_stockv2",actualizar_stock_v2)
+
+
+        # # print("parametro_productos",parametro_productos)
+        # # print("productos_lista",productos_lista)
+        # # print("productos",productos)
+        # return redirect('/comprar/carrito')
+        return render(request,'comprar.html')
+
+
+class ComprarMercadoPagoVista(View):
+    def post(self, request, usuario):
+        print("Este es el usuario recivido",usuario)
+        if request.GET.get("type") and request.GET.get("data.id"):
+            type = request.GET.get("type")
+            data_id = request.GET.get("data.id")
+            Mercado.procesar_respuesta_mp(type,data_id)
+
+        return HttpResponse(status=200)
+    
 class AgregarCarritoVista(CreateView):
     def post(self, request, producto, cantidad):
         comprobar_carrito_usuario = CarritoCompra.comprobar_carrito_usuario(request, producto)

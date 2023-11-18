@@ -1,8 +1,9 @@
 from django.urls import path
 # from . import views
-from aplicacion.views import InicioVista, RegistroVista, LoguutVista, CrearProductoVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,ActualizarProductoVista,EliminarProductoVista,LoginVista,DetalleProductoVista,CrearPedidoVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista
+from aplicacion.views import InicioVista, RegistroVista, LoguutVista, CrearProductoVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,ActualizarProductoVista,EliminarProductoVista,LoginVista,DetalleProductoVista,ComprarVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista,ComprarCarritoVista,ComprarMercadoPagoVista
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 urlpatterns = [
     path('', InicioVista.as_view(), name= 'inicio'),
     path('login', LoginVista.as_view(), name='login'),
@@ -12,7 +13,9 @@ urlpatterns = [
     path('productos/<str:filtro>/<str:valor>', ProductosVista.as_view(), name= 'productos_filtro'),
     path('producto/<slug:slug>', DetalleProductoVista.as_view(), name= 'producto_detalle'),
     path('buscar', BuscarProductosVista.as_view(), name= 'buscar'),
-    path('comprar/<slug:producto_slug>-cantidad=<int:cantidad>', CrearPedidoVista.as_view(), name='comprar'),
+    path('comprar/<slug:producto_slug>-cantidad=<int:cantidad>', ComprarVista.as_view(), name='comprar'),
+    path('comprar/carrito', ComprarCarritoVista.as_view(), name='comprar_carrito'),
+    path('comprar/mercadopago/<int:usuario>', csrf_exempt(ComprarMercadoPagoVista.as_view()), name='comprar_mp'),
     path('carrito', CarritoVista.as_view(), name='carrito'),
     path('carrito/agregar/<int:producto>-<int:cantidad>', AgregarCarritoVista.as_view(), name='agregar_carrito'),
     path('carrito/actualizar/<int:producto>-<int:cantidad>', ActualizarCarritoVista.as_view(), name='actualizar_carrito'),
