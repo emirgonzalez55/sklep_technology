@@ -150,17 +150,13 @@ class EliminarProductoVista(PermissionRequiredMixin,DeleteView):
 
 class ComprarVista(View):
     def get(self, request,producto_slug,cantidad):
-        form = PagoForm
         producto = Producto.obtener_producto(slug=producto_slug)
         if producto and cantidad:
-            # comprobar_stock = Producto.comprobar_stock(producto.id_producto, cantidad)
-            usuario = request.user.id_usuario
-            preference_mercadopago = Mercado.generar_preference_mercadopago(usuario, producto=producto,cantidad=cantidad)
+            form = PagoForm
+            preference_mercadopago = Mercado.generar_preference_mercadopago(request, producto=producto,cantidad=cantidad)
             total = producto.precio_unitario * cantidad
-        
             return render(request,'comprar.html', {'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1], 'producto': producto,'cantidad': cantidad,'total': total,'form': form})
         
-
         raise Http404("Producto no encontrado")
 
     def post(self, request,producto_slug,cantidad):
@@ -170,10 +166,10 @@ class ComprarVista(View):
             check_tarjeta = Tarjeta.check_tarjeta(form)
             if check_tarjeta:
                 print("Tarjeta válida")
-                comprobar_stock = Producto.comprobar_stock(producto.id_producto, cantidad)
+                comprobar_stock = Producto.comprobar_stock(producto=producto, cantidad=cantidad)
                 if comprobar_stock:
                     print("Hay stock disponible")
-                    crear_pedido = Pedido.crear_pedido(request, producto, cantidad)
+                    crear_pedido = Pedido.crear_pedido(request, producto=producto, cantidad=cantidad)
                     if crear_pedido:
                             print("Pedido creado correctamente")
                     else:
@@ -202,10 +198,12 @@ class ComprarCarritoVista(View):
         parametro_productos = request.POST.get("productos")
         productos_lista = Pedido.procesar_parametro(parametro_productos)
         productos = Producto.obtener_producto(productos_lista=productos_lista)
-        productos1 = Producto.obtener_producto(slug="amd-ryzen-5-5950x")
-        # productos2 = Producto.obtener_producto(id_producto=1)
-        print("obtener_producto", productos)
-        print("obtener_producto", productos1)
+        Pedido.crear_pedido_carrito(request, productos=productos)
+
+        # productos1 = Producto.obtener_producto(slug="amd-ryzen-5-5950x")
+        # # productos2 = Producto.obtener_producto(id_producto=1)
+        # print("obtener_producto", productos)
+        # print("obtener_producto", productos1)
         # print("obtener_producto", productos2)
         # comprobar_stock = Producto.comprobar_stock(productos=productos)
         # comprobar_stock1 = Producto.comprobar_stock(producto=1, cantidad=1)
@@ -233,10 +231,10 @@ class ComprarMercadoPagoVista(View):
         return HttpResponse(status=200)
     
 class AgregarCarritoVista(CreateView):
-    def post(self, request, producto, cantidad):
-        comprobar_carrito_usuario = CarritoCompra.comprobar_carrito_usuario(request, producto)
+    def post(self, request, id_producto, cantidad):
+        comprobar_carrito_usuario = CarritoCompra.comprobar_carrito_usuario(request, id_producto)
         if comprobar_carrito_usuario:
-            agregar_carrito = CarritoCompra.agregar_carrito(request, producto, cantidad)
+            agregar_carrito = CarritoCompra.agregar_carrito(request, id_producto, cantidad)
             response = JsonResponse({'response':'response'})
             response.status_code = 201
             return response
@@ -247,9 +245,8 @@ class AgregarCarritoVista(CreateView):
             return response
 
 class ActualizarCarritoVista(UpdateView):
-
-    def post(self, request, producto, cantidad):
-        actualizar_cantidad = CarritoCompra.actualizar_cantidad_producto_carrito(request, producto, cantidad)
+    def post(self, request, id_producto, cantidad):
+        actualizar_cantidad = CarritoCompra.actualizar_cantidad_producto_carrito(request, id_producto, cantidad)
         if actualizar_cantidad:
             response = JsonResponse({'response':'response'})
             response.status_code = 201
@@ -260,8 +257,8 @@ class ActualizarCarritoVista(UpdateView):
             return response
 
 class EliminarCarritoVista(DeleteView):
-    def post(self, request, producto):
-        eliminar_producto_carrito = CarritoCompra.eliminar_producto_carrito(request, producto)
+    def post(self, request, id_carrito):
+        eliminar_producto_carrito = CarritoCompra.eliminar_producto_carrito(request, id_carrito)
         response = JsonResponse({'response':'response'})
         response.status_code = 201
         return response
