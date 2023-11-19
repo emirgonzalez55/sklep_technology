@@ -5,7 +5,6 @@ from django.utils.text import slugify
 from django.contrib.auth.models import  AbstractBaseUser,UserManager,PermissionsMixin,Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
-# from django.middleware import csrf
 import mercadopago
 # Create your models here.
 
@@ -117,11 +116,10 @@ class Producto(models.Model):
 
     
     def comprobar_stock(**kwargs):
-        if "producto" and "cantidad" in kwargs:
+        if "producto" in kwargs:
             producto = kwargs["producto"]
             cantidad = kwargs["cantidad"]
-            producto = Producto.obtener_producto(id_producto=producto)
-            if producto:
+            if producto and cantidad:
                 if producto.unidades_stock >= cantidad:
                     comprobar_stock = True
                 else:
@@ -129,24 +127,29 @@ class Producto(models.Model):
             else:
                 comprobar_stock = False
 
+            return comprobar_stock
+        
         if "productos" in kwargs:
             productos = kwargs["productos"]
-            for producto in productos:
-                if producto.unidades_stock >= producto.cantidad:
-                    comprobar_stock = True
-                else:
-                    comprobar_stock = False
-                    break
+            if productos:
+                for producto in productos:
+                    if producto.unidades_stock >= producto.cantidad:
+                        comprobar_stock = True
+                    else:
+                        comprobar_stock = False
+                        break
+            else:
+                comprobar_stock = False
 
-        return comprobar_stock
+            return comprobar_stock
 
     def actualizar_stock(**kwargs):
-        if "producto" and "cantidad" in kwargs:
+        if "producto" in kwargs:
             producto_id = kwargs["producto"]
             cantidad = kwargs["cantidad"]
             producto = Producto.obtener_producto(id_producto=producto_id)
             if producto:
-                comprobar_stock = Producto.comprobar_stock(producto=producto.id_producto, cantidad=cantidad)
+                comprobar_stock = Producto.comprobar_stock(producto=producto, cantidad=cantidad)
                 if comprobar_stock:
                     producto.unidades_stock = producto.unidades_stock - cantidad
                     producto.save()
@@ -200,25 +203,52 @@ class Pedido(models.Model):
         verbose_name_plural = "Pedidos"
         db_table = "aplicacion_pedidos"
 
-    def crear_pedido(request, producto, cantidad):
-        usuario = request.user.id_usuario
-        pedido = Pedido(
-            usuario_id  = usuario,
-        )
-        pedido.save()
-        if pedido:
-            pedido_detalle = PedidoDetalle(
-                pedido_id  = pedido.id_pedido,
-                producto_id = producto.id_producto,
-                cantidad = cantidad
-            )
-            pedido_detalle.save()
-            if pedido_detalle:
-                actualizar_stock = Producto.actualizar_stock(producto.id_producto ,cantidad)
-                if actualizar_stock:
-                    pedido = True
-        return pedido
-    
+    def crear_pedido(request,**kwargs):
+        if "producto" in kwargs:
+            producto = kwargs["producto"]
+            cantidad = kwargs["cantidad"]
+            comprobar_stock = Producto.comprobar_stock(producto=producto,cantidad=cantidad)
+            if comprobar_stock:
+                usuario = request.user.id_usuario
+                pedido = Pedido(
+                    usuario_id  = usuario,
+                )
+                pedido.save()
+                if pedido:
+                    pedido_detalle = PedidoDetalle.crear_pedido_detalle(id_pedido=pedido.id_pedido,producto=producto,cantidad=cantidad)
+                    if pedido_detalle:
+                        pedido = True
+                    else:
+                        pedido = False
+                else:
+                    pedido = False
+            else:
+                pedido = False
+            
+            return pedido
+
+        if "productos" in kwargs:
+            productos = kwargs["productos"]
+            comprobar_stock = Producto.comprobar_stock(productos=productos)
+            if comprobar_stock:
+                usuario = request.user.id_usuario
+                pedido = Pedido(
+                    usuario_id  = usuario,
+                )
+                pedido.save()
+                if pedido:
+                    pedido_detalle = PedidoDetalle.crear_pedido_detalle(id_pedido=pedido.id_pedido,productos=productos)
+                    if pedido_detalle:
+                        pedido = True
+                    else:
+                        pedido = False
+                else:
+                    pedido = False
+            else:
+                pedido = False
+                
+            return pedido
+
     def procesar_parametro(productos):
         productos_procesados = []
         for producto in productos.split(","):
@@ -246,6 +276,62 @@ class PedidoDetalle(models.Model):
         verbose_name = "Pedido detalle"
         verbose_name_plural = "Pedidos detalle"
         db_table = "aplicacion_pedidos_detalle"
+
+    def crear_pedido_detalle(**kwargs):
+        if "productos" in kwargs:
+            productos = kwargs["productos"]
+            id_pedido = kwargs["id_pedido"]
+            comprobar_stock = Producto.comprobar_stock(productos=productos)
+            if comprobar_stock:
+                print("Si hay stock de los productos")
+                for producto in productos:
+                    pedido_detalle = PedidoDetalle(
+                        pedido_id  = id_pedido,
+                        producto_id = producto.id_producto,
+                        cantidad = producto.cantidad
+                    )
+                    pedido_detalle.save()
+                if pedido_detalle:
+                    print("pedido_detalle creado corretamente",pedido_detalle)
+                    actualizar_stock = Producto.actualizar_stock(productos=productos)
+                    if actualizar_stock:
+                        print("actualizar_stock corretamente")
+                        pedido_detalle = True
+                    else:
+                        pedido_detalle = False
+                else:
+                    pedido_detalle = False
+            else:
+                pedido_detalle = False
+
+            return pedido_detalle
+
+        if "producto" in kwargs:
+            producto = kwargs["producto"]
+            cantidad = kwargs["cantidad"]
+            id_pedido = kwargs["id_pedido"]
+            
+            comprobar_stock = Producto.comprobar_stock(producto=producto,cantidad=cantidad)
+            if comprobar_stock:
+                pedido_detalle = PedidoDetalle(
+                    pedido_id  = id_pedido,
+                    producto_id = producto.id_producto,
+                    cantidad = cantidad
+                )
+                pedido_detalle.save()
+                if pedido_detalle:
+                    actualizar_stock = Producto.actualizar_stock(producto=producto.id_producto ,cantidad=cantidad)
+                    if actualizar_stock:
+                        pedido_detalle = True
+                    else:
+                        pedido_detalle = False
+                else:
+                    print("Error al craer pedido individual")
+            else:
+                pedido_detalle = False
+
+            return pedido_detalle
+    
 
 class Tarjeta(models.Model):
     id_tarjeta = models.AutoField(primary_key=True)
@@ -281,13 +367,14 @@ class CarritoCompra(models.Model):
         verbose_name_plural = "Carrito de compras"
         db_table = "aplicacion_carrito_compras"
 
-    def agregar_carrito(request, producto, cantidad):
+    def agregar_carrito(request, id_producto, cantidad):
         usuario = request.user.id_usuario
-        comprobar_stock = Producto.comprobar_stock(producto, cantidad)
+        producto = Producto.obtener_producto(id_producto = id_producto)
+        comprobar_stock = Producto.comprobar_stock(producto=producto, cantidad=cantidad)
         if comprobar_stock:
             carrito = CarritoCompra(
                 usuario_id = usuario,
-                producto_id = producto,
+                producto_id = producto.id_producto,
                 cantidad = cantidad
             )
             carrito.save()
@@ -295,22 +382,16 @@ class CarritoCompra(models.Model):
 
     def obtener_carrito(usuario):
         total = 0
-
         carrito_compra = CarritoCompra.objects.filter(usuario=usuario)
         if carrito_compra:
             for carrito in carrito_compra:
-
-
                 if carrito.producto.unidades_stock:
                     carrito.subtotal = carrito.producto.precio_unitario * carrito.cantidad
                     carrito.cantidad_select = range(1, carrito.producto.unidades_stock + 1)
                     total += carrito.subtotal
-
                 else:
                     carrito.cantidad = 0
                     carrito.save()
-        else:
-            carrito_compra = None
 
         return carrito_compra, total
 
@@ -328,7 +409,7 @@ class CarritoCompra(models.Model):
         usuario = request.user.id_usuario
         try:
             cantidad_producto_carrito = CarritoCompra.objects.get(id_carrito = carrito, usuario = usuario)
-            comprobar_stock = Producto.comprobar_stock(cantidad_producto_carrito.producto_id, cantidad)
+            comprobar_stock = Producto.comprobar_stock(producto=cantidad_producto_carrito.producto, cantidad=cantidad)
             if comprobar_stock:
                 cantidad_producto_carrito.cantidad = cantidad
                 cantidad_producto_carrito.save()
@@ -339,10 +420,10 @@ class CarritoCompra(models.Model):
 
         return cantidad_producto_carrito
 
-    def eliminar_producto_carrito(request, pk):
+    def eliminar_producto_carrito(request, id_carrito):
         usuario = request.user.id_usuario
         try:
-            producto_carrito = CarritoCompra.objects.get(id_carrito=pk,usuario=usuario)
+            producto_carrito = CarritoCompra.objects.get(id_carrito=id_carrito,usuario=usuario)
             producto_carrito.delete()
 
         except ObjectDoesNotExist:
@@ -354,11 +435,11 @@ class Mercado(models.Model):
     private_access_token = models.CharField(max_length=255)
     public_access_token = models.CharField(max_length=255)
 
-    def generar_preference_mercadopago(usuario,**kwargs):
+    def generar_preference_mercadopago(request,**kwargs):
         tokens = Mercado.objects.get(id=1)
         public_token = tokens.public_access_token
         sdk = mercadopago.SDK(tokens.private_access_token)
-        # usuario = request.user.id_usuario
+        usuario = request.user.id_usuario
 
         if "producto" and "cantidad" in kwargs:
             producto = kwargs["producto"]
