@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse, JsonResponse,Http404
 from django.contrib import messages
 from aplicacion.forms import RegistroForm, LoginForm, ProductForm,PagoForm
-from aplicacion.models import Usuario, Producto,Tarjeta,Pedido,CarritoCompra,Mercado,ProductoCategoria,ProductoMarca
+from aplicacion.models import Usuario, Producto,Tarjeta,Pedido,CarritoCompra,Mercado,ProductoCategoria,ProductoMarca,PedidoPreferencia
 from django.contrib.auth.views import LoginView,LogoutView
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView,TemplateView,DetailView,View
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -148,76 +148,130 @@ class EliminarProductoVista(PermissionRequiredMixin,DeleteView):
     success_url = reverse_lazy('administrar_productos')
 
 
-class ComprarVista(View):
+class ComprarMetodoPagoVista(View):
     def get(self, request,producto_slug,cantidad):
         producto = Producto.obtener_producto(slug=producto_slug)
         if producto and cantidad:
             form = PagoForm
+            preferencia = PedidoPreferencia.crear_preferencia(request,producto=producto,cantidad=cantidad)
             preference_mercadopago = Mercado.generar_preference_mercadopago(request, producto=producto,cantidad=cantidad)
             total = producto.precio_unitario * cantidad
-            return render(request,'comprar.html', {'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1], 'producto': producto,'cantidad': cantidad,'total': total,'form': form})
+            return render(request,'comprar_pago.html', {'preferencia': preferencia,'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1], 'producto': producto,'cantidad': cantidad,'total': total,'form': form})
         
         raise Http404("Producto no encontrado")
 
     def post(self, request,producto_slug,cantidad):
         producto = Producto.obtener_producto(slug=producto_slug)
         form = PagoForm(request.POST or None)
+        id_preferencia = request.POST.get("preferencia-id")
         if form.is_valid():
             check_tarjeta = Tarjeta.check_tarjeta(form)
             if check_tarjeta:
+                actulizar_preferencia = PedidoPreferencia.actulizar_preferencia(request,id_preferencia,tarjeta=check_tarjeta)
                 print("Tarjeta válida")
-                comprobar_stock = Producto.comprobar_stock(producto=producto, cantidad=cantidad)
-                if comprobar_stock:
-                    print("Hay stock disponible")
-                    crear_pedido = Pedido.crear_pedido(request, producto=producto, cantidad=cantidad)
-                    if crear_pedido:
-                            print("Pedido creado correctamente")
-                    else:
-                        print("Error al procesar pedido")
-                else: 
-                    print("No hay stock disponible")
+                if actulizar_preferencia:
+                    if check_tarjeta.tipo == "credito":
+                        print(check_tarjeta.tipo)
+                        url = f"/comprar/pago/cuotas/preferencia-id={id_preferencia}"
+                        response = JsonResponse({'url': url})
+                        response.status_code = 201
+                        return response
+                    if check_tarjeta.tipo == "debito":
+                        pass
             else:
-                print("Tarjeta inválida")    
+                print("Tarjeta inválida")  
+                # comprobar_stock = Producto.comprobar_stock(producto=producto, cantidad=cantidad)
+                # if comprobar_stock:
+                #     print("Hay stock disponible")
+                #     crear_pedido = Pedido.crear_pedido(request, producto=producto, cantidad=cantidad)
+                #     if crear_pedido:
+                #         print("Pedido creado correctamente")
+                #         response = JsonResponse({'response':"response"})
+                #         response.status_code = 201
+                #         return response
+                #     else:
+                #         print("Error al procesar pedido")
+                # else: 
+                #     print("No hay stock disponible")
+                #     response = JsonResponse({'response':"response"})
+                #     response.status_code = 404
+                #     return response
+  
 
-        return render(request,'comprar.html', {'producto': producto,'cantidad': cantidad,'form': form})
+        return render(request,'comprar_pago.html', {'producto': producto,'cantidad': cantidad,'form': form})
+    
+class ComprarPagoCuotasVista(View):
+
+    def get(self, request,id_preferencia):
+        print(id_preferencia)
+        preferencia = PedidoPreferencia.obtener_preferencia(request,id_preferencia)
+        if preferencia:
+            if "tarjeta_datos" in preferencia.preferencia:
+                tarjeta_cuotas = preferencia.preferencia["tarjeta_cuotas"]
+                tarjeta_datos = preferencia.preferencia["tarjeta_datos"]
+                print(preferencia.preferencia["tarjeta_datos"])
+                print(preferencia.preferencia["tarjeta_cuotas"])
+
+                return render(request,'comprar_cuotas.html',{'tarjeta_cuotas':tarjeta_cuotas,'tarjeta_datos':tarjeta_datos})
+            else:
+                print("No hay datos de tarjeta en la preferecia")
+            print(preferencia)
+
+        raise Http404("Página no encontrada")
+
+    def post(self, request, id_preferencia):
+        obtener_preferencia = PedidoPreferencia.obtener_preferencia(request,id_preferencia)
+        cuotas = request.POST.get("cuotas")
+        if obtener_preferencia:
+            preferencia = obtener_preferencia.preferencia
+            if "tarjeta_datos" in preferencia and "productos":
+                actulizar_preferencia = PedidoPreferencia.actulizar_preferencia(request, id_preferencia, cuotas=cuotas)
+                url=f"/comprar/resumen/preferencia-id={id_preferencia}"
+                response = JsonResponse({'url': url})
+                response.status_code = 201
+                return response
+            
+        raise Http404("Página no encontrada")
+
+        
+class ComprarResumen(View):
+
+    def get(self, request,id_preferencia):
+        obtener_preferencia = PedidoPreferencia.obtener_preferencia(request,id_preferencia)
+        if obtener_preferencia:
+            preferencia = obtener_preferencia.preferencia
+            if "tarjeta_datos" in preferencia and "productos":
+                print(preferencia["productos"])
+                print(preferencia["tarjeta_datos"])
+
+            return render(request,'comprar_confirmacion.html')
+
+        raise Http404("Página no encontrada")
+
+    def post(self, request, id_preferencia):
+        print(request.POST)
+        return HttpResponse(status=200)
+    
 
 class ComprarCarritoVista(View):
 
 
     def get(self, request):
-        usuario = request.user.id_usuario
         form = PagoForm
-        obtener_carrito = CarritoCompra.obtener_carrito(usuario)
+        obtener_carrito = CarritoCompra.obtener_carrito(request)
         carrito = obtener_carrito[0]
         productos_lista = Pedido.procesar_lista_productos(carrito)
         total = obtener_carrito[1]
-        preference_mercadopago = Mercado.generar_preference_mercadopago(usuario, carrito=carrito)
-        return render(request,'comprar.html', {'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1],'carrito_compra': carrito,'total': total,'form': form, 'productos_lista':productos_lista})
+        preferencia = PedidoPreferencia.crear_preferencia(request,carrito=carrito)
+        preference_mercadopago = Mercado.generar_preference_mercadopago(request, carrito=carrito)
+        return render(request,'comprar_pago.html', {'preference': preference_mercadopago[0],'public_token': preference_mercadopago[1],'carrito_compra': carrito,'total': total,'form': form, 'productos_lista':productos_lista})
     
     def post(self, request):
         parametro_productos = request.POST.get("productos")
         productos_lista = Pedido.procesar_parametro(parametro_productos)
         productos = Producto.obtener_producto(productos_lista=productos_lista)
         Pedido.crear_pedido_carrito(request, productos=productos)
-
-        # productos1 = Producto.obtener_producto(slug="amd-ryzen-5-5950x")
-        # # productos2 = Producto.obtener_producto(id_producto=1)
-        # print("obtener_producto", productos)
-        # print("obtener_producto", productos1)
-        # print("obtener_producto", productos2)
-        # comprobar_stock = Producto.comprobar_stock(productos=productos)
-        # comprobar_stock1 = Producto.comprobar_stock(producto=1, cantidad=1)
-        # actualizar_stock = Producto.actualizar_stock(producto=1, cantidad=1)
-        # print("actualizar_stock",actualizar_stock)
-        # actualizar_stock_v2 = Producto.actualizar_stock(productos=productos)
-        # print("actualizar_stockv2",actualizar_stock_v2)
-
-
-        # # print("parametro_productos",parametro_productos)
-        # # print("productos_lista",productos_lista)
-        # # print("productos",productos)
-        # return redirect('/comprar/carrito')
-        return render(request,'comprar.html')
+        return render(request,'comprar_pago.html')
 
 
 class ComprarMercadoPagoVista(View):
@@ -268,8 +322,7 @@ class CarritoVista(ListView):
     context_object_name = "carrito_productos"
     # paginate_by = 10
     def get_queryset(self):
-        usuario = self.request.user.id_usuario
-        carrito = CarritoCompra.obtener_carrito(usuario=usuario)
+        carrito = CarritoCompra.obtener_carrito(self.request)
         queryset = carrito[0]
         queryset.total = carrito[1]
 
