@@ -3,7 +3,7 @@ function link_compra(producto) {
     var cantidad = document.getElementById("cantidad").value
 
     setTimeout(function() {
-        window.location.href = "/comprar/"+producto+"-cantidad="+cantidad+""; 
+        window.location.href = "/comprar/pago/"+producto+"-cantidad="+cantidad+""; 
     }, 1200);
    
 }
@@ -85,3 +85,47 @@ function animacion_boton(animacion, boton){
 //     document.getElementById("barra-compra").classList.toggle("progress-bar-animated");
 
 //   }
+function metodo_pago(){
+    mostrar_modal("modal-cargar")
+    $.ajax({
+        data: $('#form-comprar').serialize(),
+        type: $('#form-comprar').attr('method'),
+        success: function(response){
+            console.log(response);
+            setTimeout(() => {
+                cerrar_modal("modal-cargar")
+                window.location.href = response.url; 
+            }, 1000);
+            
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+}
+function mostrar_modal(modal){
+    $("#"+modal+"").modal("show");	
+}
+function cerrar_modal(modal){
+    $("#"+modal+"").modal("hide");
+}
+
+
+function metodo_pago_cuotas(){
+    mostrar_modal("modal-cargar")
+    $.ajax({
+        data: $('#form-cuotas').serialize(),
+        type: $('#form-cuotas').attr('method'),
+        success: function(response){
+            console.log(response);
+            setTimeout(() => {
+                cerrar_modal("modal-cargar")
+                window.location.href = response.url; 
+            }, 1000);
+            
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+}
