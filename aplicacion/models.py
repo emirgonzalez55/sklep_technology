@@ -5,7 +5,9 @@ from django.utils.text import slugify
 from django.contrib.auth.models import  AbstractBaseUser,UserManager,PermissionsMixin,Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
+from decimal import Decimal
 import mercadopago
+import json
 # Create your models here.
 
 class Usuario(AbstractBaseUser,PermissionsMixin):
@@ -270,6 +272,7 @@ class PedidoDetalle(models.Model):
     id_pedido_detalle = models.AutoField(primary_key=True)
     pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True)
     producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad = models.PositiveBigIntegerField()
 
     class Meta:
@@ -288,6 +291,7 @@ class PedidoDetalle(models.Model):
                     pedido_detalle = PedidoDetalle(
                         pedido_id  = id_pedido,
                         producto_id = producto.id_producto,
+                        precio_unitario = producto.precio_unitario,
                         cantidad = producto.cantidad
                     )
                     pedido_detalle.save()
@@ -316,6 +320,7 @@ class PedidoDetalle(models.Model):
                 pedido_detalle = PedidoDetalle(
                     pedido_id  = id_pedido,
                     producto_id = producto.id_producto,
+                    precio_unitario = producto.precio_unitario,
                     cantidad = cantidad
                 )
                 pedido_detalle.save()
@@ -336,8 +341,11 @@ class PedidoDetalle(models.Model):
 class Tarjeta(models.Model):
     id_tarjeta = models.AutoField(primary_key=True)
     numero = models.PositiveBigIntegerField()
+    red = models.CharField(max_length=32)
+    tipo = models.CharField(max_length=32)
     codigo_seguridad = models.PositiveSmallIntegerField()
     fecha_caducidad = models.PositiveSmallIntegerField()
+    intereses = models.JSONField(null=True)
 
     class Meta:
         verbose_name = "Tarjeta"
@@ -380,7 +388,8 @@ class CarritoCompra(models.Model):
             carrito.save()
 
 
-    def obtener_carrito(usuario):
+    def obtener_carrito(request):
+        usuario = request.user.id_usuario
         total = 0
         carrito_compra = CarritoCompra.objects.filter(usuario=usuario)
         if carrito_compra:
@@ -499,7 +508,111 @@ class Mercado(models.Model):
                 for producto in productos:
                     print(producto["id"])
                     print(producto["title"])
+
+
+class PedidoPreferencia(models.Model):
+    id_preferencia = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
+    preferencia = models.JSONField()
+
+    class Meta:
+        db_table = "aplicacion_pedidos_preferencias"
+
+    def crear_preferencia(request,**kwargs):
+        usuario = request.user.id_usuario
+        try:
+            preferencia_usuario = PedidoPreferencia.objects.get(usuario_id=usuario)
+        except ObjectDoesNotExist:
+            preferencia_usuario = None
+        if preferencia_usuario:
+            preferencia_usuario.delete()
+
+        preferencia = {}
+        if "carrito" in kwargs:
+            carrito_compra = kwargs["carrito"]
+            productos_lista = []
+            total = 0
+            for carrito in carrito_compra:
+                if carrito.producto.unidades_stock and carrito.cantidad:
+                    productos_lista.append({ "id_producto": carrito.producto.id_producto, "producto_nombre": carrito.producto.producto_nombre ,"cantidad": carrito.cantidad,"precio_unitario": float(carrito.producto.precio_unitario)})
+                    total += float(carrito.producto.precio_unitario * carrito.cantidad)
+
+            preferencia["productos"]=productos_lista
+            preferencia["total"]=total
+
+
+        if "producto" in kwargs:
+            producto = kwargs["producto"]
+            cantidad = kwargs["cantidad"]
+            productos = [
+                    {"id_producto": producto.id_producto,
+                    "producto_nombre": producto.producto_nombre,
+                    "cantidad": cantidad,
+                    "precio_unitario": float(producto.precio_unitario)
+                    }
+            ]  
+            total = float(producto.precio_unitario * cantidad)
+            preferencia["productos"]=productos
+            preferencia["total"]=total
+
+        preferencia_datos = json.dumps(preferencia)
+        if preferencia_datos:
+            preferencia = PedidoPreferencia(
+                usuario_id = usuario,
+                preferencia = preferencia_datos
+            )
+            preferencia.save()
+            preferencia = PedidoPreferencia.obtener_preferencia(request,preferencia.id_preferencia)
             
+        return preferencia
+    
+    def obtener_preferencia(request,id_preferencia):
+        usuario = request.user.id_usuario
+        try:
+            preferencia = PedidoPreferencia.objects.get(id_preferencia=id_preferencia,usuario_id=usuario)
+            preferencia.preferencia = json.loads(preferencia.preferencia) 
+        except ObjectDoesNotExist:
+            preferencia = None
+
+        return preferencia
+    
+    def actulizar_preferencia(request,id_preferencia,**kwargs):
+        obtener_preferencia = PedidoPreferencia.obtener_preferencia(request,id_preferencia)
+        if "tarjeta" in kwargs:
+            tarjeta = kwargs["tarjeta"]
+            tarjeta_datos = {
+                "tarjeta_numero": tarjeta.numero,
+                "codigo_seguridad": tarjeta.codigo_seguridad,
+                "fecha_caducidad": tarjeta.fecha_caducidad,
+                "red": tarjeta.red,
+                "tipo": tarjeta.tipo
+        }
+            obtener_preferencia.preferencia["tarjeta_datos"] = tarjeta_datos
+
+            if tarjeta.tipo == "credito":
+                total = obtener_preferencia.preferencia["total"]
+                intereses = tarjeta.intereses
+                tarjeta_cuotas = []
+                for interes in intereses:
+                    cuotas = interes["cuotas"]
+                    interes = interes["interes"]
+                    total_interes = str(round(Decimal(total * interes),2))
+                    total_cuota = str(round(Decimal(total * interes/cuotas),2))
+                    tarjeta_cuotas.append({ "cuotas": cuotas, "total_cuota": total_cuota ,"total_interes": total_interes})
+
+                obtener_preferencia.preferencia["tarjeta_cuotas"] = tarjeta_cuotas
+            
+            obtener_preferencia.preferencia = json.dumps(obtener_preferencia.preferencia)
+            obtener_preferencia.save()
+
+            return obtener_preferencia
+        if "cuotas" in kwargs:
+            cuotas = kwargs["cuotas"]
+            obtener_preferencia.preferencia["tarjeta_datos"]["cuotas"] = cuotas
+            obtener_preferencia.preferencia = json.dumps(obtener_preferencia.preferencia)
+            obtener_preferencia.save()
+        pass
+
 @receiver(pre_save)
 def crear_slug(sender, instance, **kwargs):
     if sender == Producto:
