@@ -1,0 +1,166 @@
+{% extends "base/base.html" %}
+{% block titulo %} Comprar {% endblock %}
+{% block contenido %}  
+<div class="accordion container p-0" id="accordion">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Metodo de pago tarjeta
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordion">
+      <div class="container">
+        <div class="row justify-content-center row-cols-1 row-cols-sm-1 row-cols-md-2 mt-2">
+          <div class="col" style="max-width: 350px;">
+            <div class="card bg-secondary">
+                <div class="card-body">
+                  <p class="card-text">TARJETA DE PAGO</p>
+                  <p class="card-text">1234 1234 1234 1234</p>
+                  <p class="card-text">VCTO 08/24</p>
+                  <div class="d-flex justify-content-between">
+                    <p class="card-text">NOMBRE APELLIDO</p>
+                    <p class="card-text">METODO PAGO</p>
+                  </div>
+                </div>
+            </div>
+          </div>
+            <div class="col" style="max-width: 350px;">
+              <form method="post" id="form-comprar">{% csrf_token %}
+                <input type="hidden" name="preferencia-id" value="{{preferencia.id_preferencia}}">
+                {% if carrito_compra %}
+                <input type="hidden" name="productos" value="{{ productos_lista }}">
+                {% endif %}
+              <div class="row">
+                <div class="col mt-1">
+                  <label for="">Nombre del titular</label>
+                  {{form.tarjeta_titular}}
+                  <span>{{ form.tarjeta_titular.errors }}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col mt-1">
+                  <label for="">Número de la tarjeta</label>
+                  {{form.tarjeta_numero}}
+                  <span>{{ form.tarjeta_numero.errors }}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col mt-1">
+                  <label for="">Fecha de caducidad</label>
+                  {{form.tarjeta_fecha}}
+                  <span>{{ form.tarjeta_fecha.errors }}</span>
+                </div>
+                <div class="col mt-1">
+                  <label for="">Codigo de seguridad</label>
+                  {{form.tarjeta_codigo}}
+                  <span>{{ form.tarjeta_codigo.errors }}</span>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between border mt-2 ">
+          <div class="col mb-1 mt-1">
+            <h3>Total a pagar: $ {{ total }}</h3>
+          </div>
+          <div class="col d-grid gap-2 mb-1 mt-1">
+            <button type="button" class="btn btn-primary" onclick="metodo_pago()">Continuar</button>
+          </div>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingTwo">
+      <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" >
+        Pagar con Mercado Pago
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordion">
+      <div class="container">
+        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between align-items-center"> 
+          <div class="col m-1">
+            <h3>Total a pagar: $ {{ total }}</h3>
+          </div>
+          <div class="col">
+            <div id="wallet_container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container border rounded mt-2">
+  <h3>Productos</h3>
+  <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto border rounded align-items-center d-flex justify-content-between mb-1">
+    {% if producto %}
+    <div class="col col-md-3 d-flex align-items-center">
+      <img src="{{ producto.imagen.url}}" alt="" class="img-fluid m-1" width="100">
+      <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
+    </div>
+    <div class="col col-md-3">
+      <p class="m-1">Cantidad: {{ cantidad }} / Precio unitario: $ {{producto.precio_unitario}}</p>
+    </div>
+    {% endif %}
+    {% if carrito_compra %}
+    {% for carrito in  carrito_compra %}
+    {% if carrito.cantidad %}
+    <div class="col col-md-9 d-flex align-items-center">
+      <img src="{{ carrito.producto.imagen.url}}" alt="" class="img-fluid m-1" width="100">
+      <p class="text-truncate m-1">{{ carrito.producto.producto_nombre}}</p>
+    </div>
+    <div class="col col-md-3">
+      <p class="m-1">Cantidad: {{ carrito.cantidad }} / Precio unitario: $ {{carrito.producto.precio_unitario}}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script>
+  const mp = new MercadoPago('{{ public_token }}'); 
+  const bricksBuilder = mp.bricks();
+  mp.bricks().create("wallet", "wallet_container", {
+     initialization: {
+       preferenceId: "{{ preference.id }}",
+       redirectMode: "modal"
+      },
+  });
+</script>
+
+<div class="modal fade" id="modal-cargar" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-sm modal-dialog-centered justify-content-center">
+      <span class="spinner-border" style="width: 4rem; height: 4rem;" role="status" aria-hidden="true"></span>
+  </div>
+</div>
+
+<!-- <div class="modal fade" id="modal-comprar" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body d-flex justify-content-center">
+        <span class="spinner-border me-1" role="status" aria-hidden="true"></span>
+        <h1 class="modal-title fs-5">Procesando</h1>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- <div class="modal fade" id="modal-aviso-compra">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="titulo-aviso"></h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="body-aviso"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+{% endblock %}
