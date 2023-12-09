@@ -3,9 +3,9 @@ function link_compra(producto) {
     var cantidad = document.getElementById("cantidad").value
 
     setTimeout(function() {
-        window.location.href = "/comprar/pago/"+producto+"-cantidad="+cantidad+""; 
-    }, 1200);
-   
+        window.location.href = "/comprar/pago/"+producto+"-cantidad="+cantidad+"";
+    }, 1000);
+
 }
 
 function agregar_carrito(producto){
@@ -21,15 +21,15 @@ function agregar_carrito(producto){
             animacion_boton("carrito-animacion","carrito");
             setTimeout(function() {
                 window.location.href = "/carrito";
-            }, 1200);
+            }, 1000);
         },
         error: function(error){
             console.log(error);
             animacion_boton("carrito-animacion","carrito");
             setTimeout(function() {
                 alert("Ya tienes este producto en el carrito")
-            }, 1200);
-            
+            }, 1000);
+
         }
     });
 }
@@ -77,41 +77,176 @@ function animacion_boton(animacion, boton){
     setTimeout(function() {
         document.getElementById(animacion).classList.toggle("spinner-border");
         document.getElementById(boton).classList.toggle("disabled");
-    }, 1201);
+    }, 1000);
 }
 
-// function animacion_compra(){
-//     document.getElementById("barra-compra").classList.toggle("progress-bar");
-//     document.getElementById("barra-compra").classList.toggle("progress-bar-animated");
+function validaciones_color_valid(input) {
+    input.classList.add("is-valid");
+    if (input.classList.contains('is-invalid') ) {
+        input.classList.remove("is-invalid");
+    }
+}
+function validaciones_color_invalid(input) {
+    input.classList.add("is-invalid");
+    if (input.classList.contains('is-valid') ) {
+        input.classList.remove("is-valid");
+    }
+}
+function comprobar_form_metodo_pago(){
+    nombre_valid = /^\w{1,100}$/;
+    tarjeta_valid = /^\d{15,16}$/;
+    dni_valid = /^\d{1,8}$/;
+    fecha_valid = /^\d{4,4}$/;
+    codigo_valid = /^\d{3,4}$/;
+    var inputs = document.querySelectorAll("#form-metodo-pago input");
+    var resultado = null
+    // inputs.forEach(input => {
+    //     // console.log(input.name);
+    //     // if (input.value.length != 0) {
+    //     //     resultado = false
+    //     // }
+    //     if (input.name == "tarjeta_numero") {
+    //         if (!tarjeta_valid.test(input.value)) {
+    //             validaciones_color_invalid(input)
+    //             resultado = false
+    //         }else{
+    //             validaciones_color_valid(input)
+    //         }
+    //     }
+    // });
 
-//   }
-function metodo_pago(){
+    const validar = input => {
+        console.log(input.target.name)
+        resultado = false
+        return resultado
+    }
+
+    // for (const element in inputs) {
+    //     const input = inputs[element];
+    //     console.log(input)
+    //     input.addEventListener("blur", function() {
+    //         console.log(input.name);
+
+    //     });
+
+    //     // console.log(input)
+
+    // }
+    document.getElementById("comprar-metodo-pago").classList.toggle("disabled");
+    inputs.forEach(input => {
+        input.addEventListener("blur", function() {
+            if (input.name == "tarjeta_numero") {
+                if (!tarjeta_valid.test(input.value)) {
+                    validaciones_color_invalid(input)
+                    resultado = false
+                }else{
+                    validaciones_color_valid(input)
+                }
+            }
+            if (input.name == "dni") {
+                if (!dni_valid.test(input.value)) {
+                    validaciones_color_invalid(input)
+                    resultado = false
+                }else{
+                    validaciones_color_valid(input)
+                }
+            }
+            if (input.name == "tarjeta_fecha") {
+                if (!fecha_valid.test(input.value)) {
+                    validaciones_color_invalid(input)
+                    resultado = false
+                }else{
+                    validaciones_color_valid(input)
+                }
+            }
+            if (input.name == "tarjeta_codigo") {
+                if (!codigo_valid.test(input.value)) {
+                    validaciones_color_invalid(input)
+                    resultado = false
+                }else{
+                    validaciones_color_valid(input)
+                }
+            }
+            if (input.name == "tarjeta_titular") {
+                if (!nombre_valid.test(input.value)) {
+                    validaciones_color_invalid(input)
+                    resultado = false
+                }else{
+                    validaciones_color_valid(input)
+                }
+            }
+        });
+
+    });
+
+
+    // console.log("Esto es hola "+hola+"")
+    return resultado
+    // var resultado = false
+    // nombre_titular = document.getElementById("id_tarjeta_titular")
+    // dni = document.getElementById("id_dni")
+    // tarjeta_numero = document.getElementById("id_tarjeta_numero")
+    // if (!tarjeta_valid.test(tarjeta_numero.value)) {
+    //     validaciones_color_invalid(tarjeta_numero)
+    // }else{
+    //     validaciones_color_valid(tarjeta_numero)
+    // }
+    // // if (dni.value == "") {
+    // //     dni.classList.toggle("is-invalid");
+    // // }
+    // // if (nombre_titular.value == "") {
+    // //     nombre_titular.classList.toggle("is-invalid");
+    // //     resultado = false
+    // // }else{
+    // //     nombre_titular.classList.toggle("is-valid");
+    // //     resultado = true
+    // // }
+    // return resultado
+}
+function comprar_metodo_pago(){
     mostrar_modal("modal-cargar")
     $.ajax({
-        data: $('#form-comprar').serialize(),
-        type: $('#form-comprar').attr('method'),
+        data: $('#form-metodo-pago').serialize(),
+        type: $('#form-metodo-pago').attr('method'),
         success: function(response){
             console.log(response);
             setTimeout(() => {
                 cerrar_modal("modal-cargar")
-                window.location.href = response.url; 
+                window.location.href = response.url;
             }, 1000);
-            
+
         },
         error: function(error){
             console.log(error);
+            setTimeout(() => {
+                cerrar_modal("modal-cargar")
+                error_form(error)
+            }, 1000);
         }
     });
 }
 function mostrar_modal(modal){
-    $("#"+modal+"").modal("show");	
+    $("#"+modal+"").modal("show");
 }
 function cerrar_modal(modal){
     $("#"+modal+"").modal("hide");
 }
+function error_form(errores){
+    $("#tarjeta_titular").empty();
+    $("#dni").empty();
+    $("#tarjeta_numero").empty();
+    $("#tarjeta_fecha").empty();
+    $("#tarjeta_codigo").empty();
+    let error = "";
+    for (let item in errores.responseJSON.error){
+        error =  errores.responseJSON.error[item];
+        $("#"+item).append(error);
+
+    }
+}
 
 
-function metodo_pago_cuotas(){
+function comprar_metodo_pago_cuotas(){
     mostrar_modal("modal-cargar")
     $.ajax({
         data: $('#form-cuotas').serialize(),
@@ -120,12 +255,34 @@ function metodo_pago_cuotas(){
             console.log(response);
             setTimeout(() => {
                 cerrar_modal("modal-cargar")
-                window.location.href = response.url; 
+                window.location.href = response.url;
             }, 1000);
-            
+
         },
         error: function(error){
             console.log(error);
+        }
+    });
+}
+function comprar_confirmar(){
+    mostrar_modal("modal-comprar")
+    $.ajax({
+        data: $('#form-comprar-confirmar').serialize(),
+        type: $('#form-comprar-confirmar').attr('method'),
+        success: function(response){
+            console.log(response);
+            setTimeout(() => {
+                cerrar_modal("modal-comprar")
+                window.location.href = response.url;
+            }, 1500);
+
+        },
+        error: function(error){
+            console.log(error);
+            setTimeout(() => {
+                cerrar_modal("modal-comprar")
+                window.location.href = error.responseJSON.url;
+            }, 1500);
         }
     });
 }

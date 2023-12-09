@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {% block titulo %} Carrito  {% endblock %}
 {% block contenido %}  
-  <div class="container border mt-2" id="carrito">
+  <div class="container border border-2 rounded" id="carrito">
     <h3>Carrito de compras</h3>
     {% if not carrito_productos %}
     <div class="text-center m-1">
@@ -24,6 +24,9 @@
             <span class="">Cantidad:</span>
             <select class="form-select form-select-sm m-1" aria-label=".form-select-sm example" id="cantidad-{{ carrito.id_carrito}}" name="cantidad" onchange="editar_carrito('{{ carrito.id_carrito}}')" {% if not carrito.cantidad_select %} disabled {% endif %}>
             {% if carrito.cantidad_select  %}
+              {% if carrito.cantidad == 0 %}
+              <option selected>Elegir</option>
+              {% endif %}
               {% for cantidad in carrito.cantidad_select %}
                 {% if carrito.cantidad == cantidad %}
                   <option selected value="{{cantidad}}">{{cantidad}}</option>
@@ -50,31 +53,16 @@
     {% endfor %}
     {% if carrito_productos %}
     {% if carrito_productos.total %}
-    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between border mt-2 ">
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between  mt-2 ">
       <div class="col mb-1 mt-1">
-        <h3>Total a pagar: $ {{ carrito_productos.total }}</h3>
+        <h4>Total a pagar: $ {{ carrito_productos.total }}</h4>
       </div>
       <div class="col d-grid gap-2 mb-1 mt-1">
-        <button type="submit" class="btn btn-primary">Comprar</button>
+        <a class="btn btn-primary" href="{% url 'comprar_carrito' %}">Comprar</a>
       </div>
     </div>
     {% endif %}
     {% endif %}
   </div>
-  <!-- <style>
-    .progress-bar-inicio{
-      width: 0%;
-    }
-    .progress-bar{
-      width: 100%;
-    }
-    .animacion{
-      transition: all 2s ease .1s;
-    }
-  </style>
-  <div class="progress" id="progress">
-    <div class=" progress-bar-striped bg-success progress-bar-inicio animacion" id="barra-compra" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-  </div>
-  <button onclick="animacion_compra()">animar</button> -->
 
 {% endblock %}

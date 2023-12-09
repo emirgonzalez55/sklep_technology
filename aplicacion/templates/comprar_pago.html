@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {% block titulo %} Comprar {% endblock %}
 {% block contenido %}  
-<div class="accordion container p-0" id="accordion">
+<div class="accordion container  p-0" id="accordion">
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingOne">
       <button class="accordion-button bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -10,22 +10,21 @@
     </h2>
     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordion">
       <div class="container">
-        <div class="row justify-content-center row-cols-1 row-cols-sm-1 row-cols-md-2 mt-2">
-          <div class="col" style="max-width: 350px;">
-            <div class="card bg-secondary">
+        <div class="row justify-content-center align-items-center row-cols-1 row-cols-sm-1 row-cols-md-2 mt-2">
+          <div class="col " style="max-width: 350px;">
+            <div class="card bg-secondary" style="width: 320px; height: 190px;">
                 <div class="card-body">
-                  <p class="card-text">TARJETA DE PAGO</p>
-                  <p class="card-text">1234 1234 1234 1234</p>
-                  <p class="card-text">VCTO 08/24</p>
+                  <div class="mb-5" style="width: 58px; height: 35px; background-color: #bbb;"></div>
+                  <p class="text-white">1234 1234 1234 1234</p>
                   <div class="d-flex justify-content-between">
-                    <p class="card-text">NOMBRE APELLIDO</p>
-                    <p class="card-text">METODO PAGO</p>
+                    <p class="text-white">NOMBRE APELLIDO</p>
+                    <p class="text-white">MM/AA</p>
                   </div>
                 </div>
             </div>
           </div>
             <div class="col" style="max-width: 350px;">
-              <form method="post" id="form-comprar">{% csrf_token %}
+              <form method="post" id="form-metodo-pago" onchange="comprobar_form_metodo_pago()">{% csrf_token %}
                 <input type="hidden" name="preferencia-id" value="{{preferencia.id_preferencia}}">
                 {% if carrito_compra %}
                 <input type="hidden" name="productos" value="{{ productos_lista }}">
@@ -34,36 +33,43 @@
                 <div class="col mt-1">
                   <label for="">Nombre del titular</label>
                   {{form.tarjeta_titular}}
-                  <span>{{ form.tarjeta_titular.errors }}</span>
+                  <span class="form-text" id="tarjeta_titular"></span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col mt-1">
+                  <label for="">Número de documento</label>
+                  {{form.dni}}
+                  <span class="form-text" id="dni"></span>
                 </div>
               </div>
               <div class="row">
                 <div class="col mt-1">
                   <label for="">Número de la tarjeta</label>
                   {{form.tarjeta_numero}}
-                  <span>{{ form.tarjeta_numero.errors }}</span>
+                  <span class="form-text" id="tarjeta_numero"></span>
                 </div>
               </div>
               <div class="row">
                 <div class="col mt-1">
                   <label for="">Fecha de caducidad</label>
                   {{form.tarjeta_fecha}}
-                  <span>{{ form.tarjeta_fecha.errors }}</span>
+                  <span class="form-text" id="tarjeta_fecha"></span>
                 </div>
                 <div class="col mt-1">
                   <label for="">Codigo de seguridad</label>
                   {{form.tarjeta_codigo}}
-                  <span>{{ form.tarjeta_codigo.errors }}</span>
+                  <span class="form-text" id="tarjeta_codigo"></span>
                 </div>
               </div>
             </div>
         </div>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between border mt-2 ">
           <div class="col mb-1 mt-1">
-            <h3>Total a pagar: $ {{ total }}</h3>
+            <h4>Total a pagar: $ {{ preferencia.preferencia_datos.total }}</h4>
           </div>
           <div class="col d-grid gap-2 mb-1 mt-1">
-            <button type="button" class="btn btn-primary" onclick="metodo_pago()">Continuar</button>
+            <button type="button" class="btn btn-primary disabled" id="comprar-metodo-pago" onclick="comprar_metodo_pago()">Continuar</button>
           </div>
         </div>
       </form>
@@ -80,7 +86,7 @@
       <div class="container">
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between align-items-center"> 
           <div class="col m-1">
-            <h3>Total a pagar: $ {{ total }}</h3>
+            <h4>Total a pagar: $ {{ preferencia.preferencia_datos.total }}</h4>
           </div>
           <div class="col">
             <div id="wallet_container"></div>
@@ -92,15 +98,28 @@
 </div>
 
 <div class="container border rounded mt-2">
-  <h3>Productos</h3>
-  <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto border rounded align-items-center d-flex justify-content-between mb-1">
+  <h4>Productos</h4>
+  {% for producto in productos %}
+  <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center border border-2 justify-content-between mb-1 g-0">
+    <div class="col-md-6 d-flex align-items-center">
+      <img src="{{ producto.imagen.url}}" alt="" class="img-fluid " width="100">
+      <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
+    </div>
+    <div class="col-md-auto">
+      <p class="m-1">Cantidad: {{ producto.cantidad }} | Precio unitario: $ {{producto.precio_unitario}}
+      </p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+  <!-- <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto border rounded align-items-center d-flex justify-content-between mb-1">
     {% if producto %}
     <div class="col col-md-3 d-flex align-items-center">
       <img src="{{ producto.imagen.url}}" alt="" class="img-fluid m-1" width="100">
       <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
     </div>
     <div class="col col-md-3">
-      <p class="m-1">Cantidad: {{ cantidad }} / Precio unitario: $ {{producto.precio_unitario}}</p>
+      <p class="m-1">Cantidad: {{ cantidad }} | Precio unitario: $ {{producto.precio_unitario}}</p>
     </div>
     {% endif %}
     {% if carrito_compra %}
@@ -111,13 +130,13 @@
       <p class="text-truncate m-1">{{ carrito.producto.producto_nombre}}</p>
     </div>
     <div class="col col-md-3">
-      <p class="m-1">Cantidad: {{ carrito.cantidad }} / Precio unitario: $ {{carrito.producto.precio_unitario}}</p>
+      <p class="m-1">Cantidad: {{ carrito.cantidad }} | Precio unitario: $ {{carrito.producto.precio_unitario}}</p>
     </div>
     {% endif %}
     {% endfor %}
     {% endif %}
-  </div>
-</div>
+  </div> -->
+
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
   const mp = new MercadoPago('{{ public_token }}'); 

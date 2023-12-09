@@ -1,5 +1,87 @@
 {% extends "base/base.html" %}
-{% block titulo %} Inicio {% endblock %}
+{% block titulo %} Confirmar compra {% endblock %}
 {% block contenido %}  
+<div class="container border border-2 rounded">
+    <h4>Confirmar compra</h4>
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2">
+        <div class="col">
+            <div class="">
+                <h5>Medio de pago</h5>
+                <div class="">
+                    <ul class="list-group">
+                        <li class="list-group-item"><img src="{{ preferencia.tarjeta_datos.imagen }}" alt="" class="img-fluid me-1" width="50">{{ preferencia.tarjeta_datos.red }} terminada en {{preferencia.tarjeta_datos.tarjeta_numero|stringformat:"d"|slice:"12:16"}}</li>
+                        {% if preferencia.tarjeta_datos.cuotas %}
+                        <li class="list-group-item">{{ preferencia.tarjeta_datos.cuotas.cuotas }}x $ {{preferencia.tarjeta_datos.cuotas.total_cuota }}</li>
+                        {% else %}
+                        <li class="list-group-item">$ {{ preferencia.total }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <form method="post" id="form-comprar-confirmar">
+                {% csrf_token %}
+            </form>
+            <h5>Detalle de compra</h5>
 
+            <div class="d-flex justify-content-between">
+                {% if productos|length == 1%}
+                <p>{{productos.0.producto_nombre}} ({{productos.0.cantidad}})</p>
+                <p>$ {{productos.0.precio_unitario}}</p>
+                {% endif%}
+                {% if productos|length > 1%}
+                <p>Productos({{productos|length}})</p>
+                <p>$ {{preferencia.total }}</p>
+                {% endif%}
+            </div>
+            <div class="d-flex justify-content-between">
+                <p>A pagar:</p>
+                {% if preferencia.tarjeta_datos.cuotas %}
+                <p>{{ preferencia.tarjeta_datos.cuotas.cuotas }}x $ {{preferencia.tarjeta_datos.cuotas.total_cuota }}</p>
+                {% else %}
+                <p>$ {{preferencia.total }}</p>
+                {% endif %}
+            </div>
+            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between mb-1">
+                <div class="col ">
+                    {% if preferencia.tarjeta_datos.cuotas %}
+                    <h4>Total a pagar: {{ preferencia.tarjeta_datos.cuotas.cuotas }}x $ {{preferencia.tarjeta_datos.cuotas.total_cuota }}</h4>
+                    {% else %}
+                    <h4>Total a pagar: $ {{preferencia.total }}</h4>
+                    {% endif %}
+                </div>
+                <div class="col  d-grid gap-2">
+                    <button type="button" class="btn btn-primary" onclick="comprar_confirmar()">Comprar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="container border border-2 rounded my-2">
+    <h5>Productos</h5>
+    {% for producto in productos %}
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center d-flex border justify-content-between mb-1 g-0">
+        <div class="col-md-6 d-flex align-items-center">
+            <img src="{{ producto.imagen.url}}" alt="" class="img-fluid " width="100">
+            <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
+        </div>
+        <div class="col-md-auto">
+            <p class="m-1">Cantidad: {{ producto.cantidad }} | Precio unitario: $ {{producto.precio_unitario}}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="modal fade" id="modal-comprar" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body d-flex justify-content-center">
+        <span class="spinner-border me-1" role="status" aria-hidden="true"></span>
+        <h1 class="modal-title fs-5">Procesando</h1>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -1,14 +1,23 @@
 {% extends "base/base.html" %}
 {% block titulo %} Administrar productos {% endblock %}
-{% block contenido %}  
-<div class="d-flex  justify-content-center">
-  <button type="button" onclick="modal_producto('/administrar/productos/agregar_producto')" class="btn btn-primary">Agregar producto</button>
-</div>
+{% block contenido %} 
+
+<div class="container shadow rounded bg-body-tertiary">
+<div class="d-flex justify-content-between">
+  <h4>Listado de productos</h4>
+  <button type="button" onclick="modal_producto('/administrar/productos/agregar_producto')" class="btn btn-primary btn-sm">Agregar producto</button>
+</div> 
+<form method="get">
+  <div class="input-group my-2">
+    <input type="text" class="form-control" name="buscar" placeholder="Buscar productos">
+    <button class="btn btn-secondary" type="submit">Buscar</button>
+  </div>
+</form>
 <div class="table-responsive" id="tabla-productos">
 <table class="table">
     <thead>
       <tr>
-        <th scope="col">#</th>
+        <th scope="col">ID</th>
         <th scope="col">Imagen</th>
         <th scope="col">Producto nombre</th>
         <th scope="col">Categoria</th>
@@ -22,14 +31,14 @@
     {% for producto in productos %}
       <tr>
         <th scope="row">{{ producto.id_producto }}</th>
-        <td><img src="{{ producto.imagen.url }}" alt="" width="100px" height="100px"></td>
+        <td><img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100"></td>
         <td>{{ producto.producto_nombre }}</td>
         <td>{{ producto.categoria }}</td>
-        <td>{{ producto.precio_unitario }}</td>
+        <td>$ {{ producto.precio_unitario }}</td>
         <td>{{ producto.unidades_stock }}</td>
-        <td><button type="button" onclick="modal_producto('/administrar/productos/editar_producto/{{ producto.id_producto }}')" class="btn btn-secondary">Editar</button></td>
+        <td><button type="button" onclick="modal_producto('/administrar/productos/editar_producto/{{ producto.id_producto }}')" class="btn btn-secondary btn-sm">Editar</button></td>
         {% if perms.aplicacion.delete_productos %}  
-        <td><button type="button" onclick="modal_producto('/administrar/productos/eliminar_producto/{{ producto.id_producto }}')" class="btn btn-danger">Eliminar</button></td>
+        <td><button type="button" onclick="modal_producto('/administrar/productos/eliminar_producto/{{ producto.id_producto }}')" class="btn btn-danger btn-sm">Eliminar</button></td>
         {% endif %}
       </tr>
     {% endfor %}
@@ -55,7 +64,9 @@
     {% endif %}
     </ul>
 </nav>
-{% endif %}  
+{% endif %}
+</div>
+  
 
 <div class="modal fade" id="modal-producto"></div>
 <div class="modal fade" id="modal-aviso">
