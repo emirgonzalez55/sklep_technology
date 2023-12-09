@@ -1,0 +1,42 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Editar información</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form method="POST" action="{% url 'perfil_editar' %}" id="form-editar-perfil">
+      {% csrf_token %}
+    <div class="modal-body">
+      <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 my-1">
+        <div class="col">
+            <label for="">Nombre de usuario</label>
+            {{form.usuario}}
+            <span class="form-text" id="usuario"></span>
+        </div>
+        <div class="col">
+            <label for="">Email</label>
+            {{form.email}}
+            <span class="form-text" id="email"></span>
+        </div>
+      </div>
+      <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 my-1">
+        <div class="col">
+            <label for="">Nombre</label>
+            {{form.nombre}}
+            <span class="form-text" id="nombre"></span>
+        </div>
+        <div class="col">
+            <label for="">Apellido</label>
+            {{form.apellido}}
+            <span class="form-text" id="apellido"></span>
+        </div>
+      </div>
+      
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      <button class="btn btn-primary" type="button" onclick="form_editar_perfil()">Editar perfil</button>
+    </div>
+  </form>
+  </div>
+</div> 

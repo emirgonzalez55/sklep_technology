@@ -1,0 +1,46 @@
+{% extends "base/base.html" %}
+{% block titulo %} Perfil {% endblock %}
+{% block contenido %}
+<div class="container shadow rounded bg-body-tertiary my-1">
+    <div class="row justify-content-center my-1 align-items-center">
+        <div class="col-auto">
+            <img class="" src="/static/img/login.png" alt="" width="100" height="100">
+        </div>
+        <div class="col">
+            <h5>Usuario: {{ request.user.usuario }}</h5>
+            <h5>Email: {{ request.user.email }}</h5>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-between border-top">
+        <div class="col-auto">
+            <h5 class="my-1">Información</h5>
+
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-secondary btn-sm my-1" onclick="modal_perfil('/perfil/cambiar-password')">Cambiar contraseña</button>
+            <button class="btn btn-primary btn-sm my-1" onclick="modal_perfil('/perfil/editar')">Editar información</button>
+        </div>
+    </div>
+ 
+    <div class="container">
+    <div class="row justify-content-center my-1">
+        <div class="border-top my-1">
+            <h5>Usuario: {{ request.user.usuario }}</h5>
+        </div>
+        <div class="border-top my-1">
+            <h5>Email: {{ request.user.email }}</h5>
+        </div>
+        <div class="border-top my-1">
+            <h5>Nombre: {{ request.user.nombre }}</h5>
+        </div>
+        <div class="border-top my-1">
+            <h5>Apellido: {{ request.user.apellido }}</h5>
+        </div>
+    </div>
+</div>
+
+</div>  
+<div class="modal fade" id="modal-perfil"></div>
+{% load static %}
+<script src="{% static 'js/usuario.js' %}"></script> 
+{% endblock %}

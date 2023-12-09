@@ -1,0 +1,19 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Eliminar categoria </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'administrar_categoria_eliminar' object.id_categoria %}"> 
+        {% csrf_token %}
+      <div class="modal-body">
+            <span>¿Estás seguro de que deseas la categoria {{object.categoria_nombre}}?</span>
+            <P class="form-text">Ten en cuenta que se quitara la categoría de todos los productos que la tengan asignada</P>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger" type="submit">Eliminar categoria</button>
+      </div>
+    </form>
+    </div>
+</div> 

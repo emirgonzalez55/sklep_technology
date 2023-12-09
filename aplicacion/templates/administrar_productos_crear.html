@@ -1,0 +1,51 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Agregar producto</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <form method="POST" id="form-producto" action="{% url 'agregar_producto' %}" enctype="multipart/form-data"> 
+      {% csrf_token %}
+    <div class="modal-body">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3">
+        <div class="col col-sm-12 col-md-12 col-lg-8 my-1">
+          {{form.producto_nombre}}
+          <span class="form-text" id="producto_nombre"></span>
+        </div>
+        <div class="col my-1">
+          {{form.marca}}
+          <span class="form-text" id="marca"></span>
+        </div>
+        <div class="col my-1">
+          {{form.categoria}}
+          <span class="form-text" id="categoria"></span>
+        </div>
+        <div class="col my-1">
+          {{form.precio_unitario}}
+          <span class="form-text" id="precio_unitario"></span>
+        </div>
+        <div class="col my-1">
+          {{form.unidades_stock}}
+          <span class="form-text" id="unidades_stock"></span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col my-1">
+          {{form.descripcion}}
+          <span class="form-text" id="descripcion"></span>
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col">
+          {{form.imagen}}
+          <span class="form-text" id="imagen"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      <button class="btn btn-primary" type="button" onclick="form_productos()">Agregar producto</button>
+    </div>
+  </form>
+  </div>
+</div> 

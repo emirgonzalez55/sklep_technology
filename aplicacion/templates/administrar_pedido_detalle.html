@@ -1,0 +1,83 @@
+{% extends "base/base.html" %}
+{% block titulo %} Detalle de pedido {% endblock %}
+{% block contenido %}  
+
+<div class="container shadow rounded bg-body-tertiary">
+    <div class="d-flex justify-content-between my-1">
+        <h4>Detalle de pedido</h4>
+        <button type="button" onclick="modal_pedido('/administrar/pedido/eliminar-pedido/{{ pedido.id_pedido }}')" class="btn btn-danger btn-sm">Eliminar</button>
+    </div>
+    <div class="row border-top">
+        <div class="d-flex justify-content-between">
+            <p class="my-1">{{pedido.fecha_pedido|date }}</p>
+            <p class="my-1">Pedido: #{{pedido.id_pedido }}</p>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 border-top ">
+        <div class="col">
+            <h5>Medio de pago</h5>
+            <ul class="list-group">
+                <li class="list-group-item"><img src="{{ pedido.pedido_datos.tarjeta_datos.imagen }}" alt="" class="img-fluid me-1" width="50">{{ pedido.pedido_datos.tarjeta_datos.red }} terminada en {{pedido.pedido_datos.tarjeta_datos.tarjeta_numero|stringformat:"d"|slice:"12:16"}}</li>
+                {% if pedido.pedido_datos.tarjeta_datos.cuotas %}
+                <li class="list-group-item">Cuotas: {{ pedido.pedido_datos.tarjeta_datos.cuotas.cuotas }}x $ {{pedido.pedido_datos.tarjeta_datos.cuotas.total_cuota }}</li>
+                <li class="list-group-item">Total financiado: $ {{pedido.pedido_datos.tarjeta_datos.cuotas.total_interes }}</li>
+                {% else %}
+                <li class="list-group-item">Total debitado: $ {{pedido_detalle.total }}</li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="col">
+            <h5>Detalle</h5>
+            <div class="d-flex justify-content-between">
+                {% if pedido_detalle|length == 1%}
+                <p>{{ pedido_detalle.0.producto.producto_nombre}} ({{pedido_detalle.0.cantidad}})</p>
+                <p>$ {{pedido_detalle.0.precio_unitario}}</p>
+                {% endif%}
+                {% if pedido_detalle|length > 1%}
+                <p>Productos ({{pedido_detalle|length}})</p>
+                <p>$ {{pedido_detalle.total }}</p>
+                {% endif%}
+            </div>
+            <div class="d-flex justify-content-between">
+                <p>Subtotal</p>
+                {% if pedido.pedido_datos.tarjeta_datos.cuotas %}
+                <p>{{ pedido.pedido_datos.tarjeta_datos.cuotas.cuotas }}x $ {{pedido.pedido_datos.tarjeta_datos.cuotas.total_cuota }}</p>
+                {% else %}
+                <p>$ {{pedido_detalle.total }}</p>
+                {% endif %}
+            </div>
+            <div class="d-flex justify-content-between fw-bold">
+                {% if pedido.pedido_datos.tarjeta_datos.cuotas %}
+                <p>Total</p>
+                <p>{{ pedido.pedido_datos.tarjeta_datos.cuotas.cuotas }}x $ {{pedido.pedido_datos.tarjeta_datos.cuotas.total_cuota }}</p>
+                {% else %}
+                <p>Total</h5>
+                <p>$ {{pedido_detalle.total }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row border-top">
+        <h5>Productos</h5>
+    </div>
+    {% for pedido in pedido_detalle %}
+    <a href="{% url 'producto_detalle' pedido.producto.slug %}" class="link-body-emphasis text-decoration-none">
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center border-top justify-content-between mb-1 g-0">
+        <div class="col-md-6 d-flex align-items-center">
+          <img src="{{ pedido.producto.imagen.url}}" alt="" class="img-fluid " width="100">
+          <p class="text-truncate m-1">{{ pedido.producto.producto_nombre}}</p>
+        </div>
+        <div class="col-md-auto">
+          <p class="m-1">Cantidad: {{ pedido.cantidad }} | Precio unitario: $ {{pedido.producto.precio_unitario}}
+          </p>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+</div>
+<div class="modal fade" id="modal-pedido"></div>
+
+{% load static %}
+<script src="{% static 'js/pedidos.js' %}"></script> 
+{% endblock %}

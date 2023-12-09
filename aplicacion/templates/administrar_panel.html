@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+{% block titulo %} Administrar panel {% endblock %}
+{% block contenido %}
+<div class="container shadow rounded bg-body-tertiary my-1">
+  <h4>Panel</h4>
+    <div class="row">
+      <div class="col-auto">
+        <h5>Total mes actual</h5>
+        <p>$ {{ panel_datos.pedidos_total_mes.total_mes_actual.total }}</p>
+      </div>
+      <div class="col-auto">
+        {% if panel_datos.pedidos_total_mes.mes_diferencia > 0 %}
+        <h5>Diferencia mes actual vs anterior</h5>
+        <p class="text-success">{{ panel_datos.pedidos_total_mes.mes_diferencia }}%</p>
+        {% else %}
+        <h5>Diferencia mes actual vs anterior</h5>
+        <p class="text-danger">{{ panel_datos.pedidos_total_mes.mes_diferencia }}%</p>
+        {% endif %}
+      </div>
+      <div class="col-auto">
+        <h5>Total de productos vendidos</h5>
+        <p class="text">{{ panel_datos.pedidos_total_mes.total_mes_actual.cantidad_productos }}</p>
+      </div>
+
+    </div>
+    <h5>Gráfico total vendido por dia</h5>
+    <div class="w-100" id="grafico" style="height: 400px;"></div>
+    <h5>Datos de ventas</h5>
+    <div class="table-responsive small">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">Total vendido</th>
+            <th scope="col">Cantidad de productos</th>
+          </tr>
+        </thead>
+        <tbody>
+       {% for panel_dato in panel_datos.pedidos_total_dia %}
+          <tr>
+            <td>{{ panel_dato.pedido__fecha_pedido__date}}</td>
+            <td>$ {{ panel_dato.total}}</td>
+            <td>{{ panel_dato.cantidad_productos}}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+
+{{ panel_datos.pedidos_total_dia.grafico_datos|json_script:"grafico_datos" }}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script>
+    var grafico = echarts.init(document.getElementById('grafico'));
+    var option =  JSON.parse(document.getElementById('grafico_datos').textContent);
+    grafico.setOption(option);
+</script>
+
+{% endblock %}

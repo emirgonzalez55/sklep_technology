@@ -1,0 +1,56 @@
+{% extends "base/base.html" %}
+{% block titulo %} Inicio {% endblock %}
+{% block contenido %}
+<div class="container">
+    {% if resultado == "correcto" %}
+    <div class="d-flex justify-content-center">
+        <img class="img-fluid" src="/static/img/tilde_verde.png" alt="" width="150">
+    </div>
+    <div class="d-flex justify-content-center">
+        <h3 class="text-center">Compra realizada correctamente</h3>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'compras' %}" class="btn btn-primary">Ir a compras</a>
+    </div>
+    {% endif %}
+    {% if resultado == "falla" %}
+    <div class="d-flex justify-content-center">
+        <img class="img-fluid" src="/static/img/signo_naranja.png" alt="" width="150">
+    </div>
+    <div class="d-flex justify-content-center">
+        <h3 class="text-center">Al parecer ocurrió un problema vuelve a intentar la operacion.</h3>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'productos' %}" class="btn btn-primary">Ir a productos</a>
+    </div>
+    {% endif %}
+    {% if resultado == "falla-pago" %}
+    <div class="d-flex justify-content-center">
+        <img class="img-fluid" src="/static/img/signo_naranja.png" alt="" width="150">
+    </div>
+    <div class="d-flex justify-content-center">
+        <h3 class="text-center">Al parecer ocurrió un problema con el pago.</h3>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'productos' %}" class="btn btn-primary">Ir a productos</a>
+    </div>
+    {% endif %}
+    {% if resultado == "pendiente" %}
+    <div class="d-flex justify-content-center">
+        <img class="img-fluid" src="/static/img/signo_naranja.png" alt="" width="150">
+    </div>
+    <div class="d-flex justify-content-center">
+        <h3 class="text-center">Al parecer el pago está pendiente de acreditación.</h3>
+    </div>
+    <div class="d-flex justify-content-center">
+        <p class="text-center">Si el pago se acredita verás la compra en mis compras.</p>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'compras' %}" class="btn btn-primary">Ir a mis compras</a>
+    </div>
+    {% endif %}
+</div>
+<div class="container">
+
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Agregar categoria</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" id="form-categoria" action="{% url 'administrar_categoria_agregar' %}"> 
+        {% csrf_token %}
+      <div class="modal-body">
+        <div class="row my-1">
+          <div class="col">
+            {{form.categoria_nombre}}
+            <span class="form-text" id="categoria_nombre"></span>
+          </div>
+        </div>
+        <div class="row my-1">
+          <div class="col">
+            {{form.categoria_descripcion}}
+            <span class="form-text" id="categoria_descripcion"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" type="button" onclick="form_categorias()">Agregar categoria</button>
+      </div>
+    </form>
+    </div>
+  </div> 

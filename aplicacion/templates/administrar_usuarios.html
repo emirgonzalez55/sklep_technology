@@ -1,0 +1,78 @@
+{% extends "base/base.html" %}
+{% block titulo %} Administrar usuarios {% endblock %}
+{% block contenido %}  
+<div class="container shadow rounded bg-body-tertiary">
+    <div class="d-flex justify-content-between">
+      <h4>Listado de usuarios</h4>
+      <button class="btn btn-sm btn-primary" type="button" onclick="modal_usuario('/administrar/crear/usuario')">Agregar usuario</button>
+    </div>
+      <form method="get">
+        <div class="input-group my-2">
+          <input type="text" class="form-control" name="buscar" placeholder="Buscar usuario">
+          <button class="btn btn-secondary" type="submit">Buscar</button>
+        </div>
+      </form>
+    <div class="table-responsive small" id="tabla-usuarios">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre de usuario</th>
+            <th scope="col">Grupo</th>
+            <th scope="col" colspan="2">Acciones</th>
+
+          </tr>
+        </thead>
+        <tbody>
+        {% for usuario in usuarios %}
+          <tr>
+            <td>{{ usuario.id_usuario}}</td>
+            <td>{{ usuario }}</td>
+            <td>{% for group in usuario.groups.all %}{{group}} {% endfor %}</td>
+            <td><button class="btn btn-sm btn-secondary" type="button" onclick="modal_usuario('/administrar/editar/usuario/{{ usuario.id_usuario}}')">Editar</button></td>
+            <td><button class="btn btn-sm btn-danger" type="button" onclick="modal_usuario('/administrar/usuarios/eliminar/{{ usuario.id_usuario}}')">Eliminar</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if is_paginated %}
+    <nav>
+      <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number}}">Anterior</a></li>
+      {% else %}
+        <li class="page-item disabled"><a class="page-link" href="">Anterior</a></li>
+      {% endif %}  
+      {% for page in paginator.page_range %}
+              <li class="page-item {% if page_obj.number == page %} active {% endif %}"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number}}">Siguiente</a></li>
+      {% else %}
+        <li class="page-item disabled"><a class="page-link" href="">Siguiente</a></li>
+      {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+</div>
+<div class="modal fade" id="modal-usuario"></div>
+<div class="modal fade" id="modal-aviso">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="titulo-aviso"></h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="body-aviso"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% load static %}
+<script src="{% static 'js/usuario.js' %}"></script> 
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base/base.html" %}
+{% block titulo %} Compras {% endblock %}
+{% block contenido %}  
+
+<div class="container">
+<h4>Compras</h4>
+{% for pedido in pedidos %}
+<div class="row mb-1 border ">
+    <div class="d-flex justify-content-between">
+        <p class="my-1">{{ pedido.pedido.fecha_pedido|date }}</p>
+        <a class="btn btn-primary btn-sm my-1" href="{% url 'compra_detalle' pedido.pedido.id_pedido %}">Ver compra</a>
+    </div>
+
+    {% for pedido_detalle in pedido.pedido_detalle %}
+    <div class="container">
+    <div class="row border-top my-1 align-items-center">
+        <div class="col d-flex align-items-center">
+            <img src="{{ pedido_detalle.producto.imagen.url}}" alt="" class="img-fluid " width="100">
+            <p class="text-truncate m-1">{{ pedido_detalle.producto.producto_nombre}}</p>
+        </div>
+    </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+</div>
+{% endblock %}
+
+
+

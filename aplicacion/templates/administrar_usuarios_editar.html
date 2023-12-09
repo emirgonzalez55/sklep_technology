@@ -1,0 +1,48 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'administrar_editar_usuario' object.id_usuario %}" id="form-usuario" >  
+        {% csrf_token %}
+      <div class="modal-body">
+        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2">
+            <div class="col my-1">
+                <!-- <label for="">{{ form.usuario.label}}</label> -->
+                <input type="{{ form.usuario.field.widget.input_type}}" name="{{ form.usuario.name }}" value="{{ usuario }}" class="form-control" placeholder="{{ form.usuario.label}}">
+                <span class="form-text" id="usuario"></span>
+            </div>
+            <div class="col my-1">
+                <!-- <label for="">{{ form.email.label}}</label> -->
+                <input type="{{ form.email.field.widget.input_type}}" name="{{ form.email.name }}" value="{{ usuario.email }}" class="form-control" placeholder="{{ form.email.label}}">
+                <span class="form-text" id="email"></span>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2">
+            <div class="col my-1">
+                <!-- <label for="">{{ form.nombre.label}}</label> -->
+                <input type="{{ form.nombre.field.widget.input_type}}" name="{{ form.nombre.name }}" value="{{ usuario.nombre }}" class="form-control" placeholder="{{ form.nombre.label}}">
+                <span class="form-text" id="nombre"></span>
+            </div>
+            <div class="col my-1">
+                <!-- <label for="">{{ form.apellido.label}}</label> -->
+                <input type="{{ form.apellido.field.widget.input_type}}" name="{{ form.apellido.name }}" value="{{ usuario.apellido }}" class="form-control" placeholder="{{ form.apellido.label}}">
+                <span class="form-text" id="apellido"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <!-- <label for="">{{ form.groups.label}}</label> -->
+                {{ form.groups}}
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" type="button" onclick="form_usuario()">Editar usuario</button>
+      </div>
+    </form>
+    </div>
+  </div> 
