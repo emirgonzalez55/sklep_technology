@@ -1,30 +1,52 @@
 from django.urls import path
 # from . import views
-from aplicacion.views import InicioVista, RegistroVista, LoguutVista, CrearProductoVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,ActualizarProductoVista,EliminarProductoVista,LoginVista,DetalleProductoVista,ComprarMetodoPagoVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista,ComprarCarritoVista,ComprarMercadoPagoVista,ComprarPagoCuotasVista,ComprarResumen
+from aplicacion.views import InicioVista, RegistroVista, LoguutVista, CrearProductoVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,ActualizarProductoVista,EliminarProductoVista,LoginVista,DetalleProductoVista,ComprarMetodoPagoVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista,ComprarCarritoVista,ComprarMercadoPagoVista,ComprarPagoCuotasVista,ComprarConfirmar,ComprasVista,ComprarResultadoVista,AdministrarPanelVista,AdministrarPedidosVista,AdministrarPedidoDetalleVista,EliminarPedidoVista,CompraDetalleVista,PerfilEditarVista,PerfilCambiarPasswordVista,PerfilVista,AdministrarUsuariosVista,AdministrarCrearUsuarioVista,AdministrarEditarUsuarioVista,AdministrarCategoriasVista,AdministrarMarcasVista,AdministrarCrearCategoriaVista,AdministrarEditarCategoriaVista,AdministrarCategoriaEliminarVista,AdministrarMarcaCrearVista,AdministrarMarcaEditarVista,AdministrarMarcaEliminarVista,AdministrarUsuariosEliminarVista
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 urlpatterns = [
-    path('', InicioVista.as_view(), name= 'inicio'),
+    path('', InicioVista.as_view(), name='inicio'),
     path('login', LoginVista.as_view(), name='login'),
-    path('registro', RegistroVista.as_view(), name= 'registro'),
-    path('logout', LoguutVista.as_view(), name= 'logout'),
+    path('registro', RegistroVista.as_view(), name='registro'),
+    path('logout', LoguutVista.as_view(), name='logout'),
+    path('perfil', PerfilVista.as_view(), name='perfil'),
+    path('perfil/editar', PerfilEditarVista.as_view(), name= 'perfil_editar'),
+    path('perfil/cambiar-password', PerfilCambiarPasswordVista.as_view(), name='perfil_cambiar_password'),
     path('productos', ProductosVista.as_view(), name= 'productos'),
     path('productos/<str:filtro>/<str:valor>', ProductosVista.as_view(), name= 'productos_filtro'),
     path('producto/<slug:slug>', DetalleProductoVista.as_view(), name= 'producto_detalle'),
     path('buscar', BuscarProductosVista.as_view(), name= 'buscar'),
+    path('compras', ComprasVista.as_view(), name='compras'),
+    path('compra/compra-id=<int:id_pedido>', CompraDetalleVista.as_view(), name='compra_detalle'),
     path('comprar/pago/<slug:producto_slug>-cantidad=<int:cantidad>', ComprarMetodoPagoVista.as_view(), name='comprar_pago'),
     path('comprar/pago/cuotas/preferencia-id=<int:id_preferencia>', ComprarPagoCuotasVista.as_view(), name='comprar_pagocuotas'),
-    path('comprar/resumen/preferencia-id=<int:id_preferencia>', ComprarResumen.as_view(), name='comprar_resumen'),
+    path('comprar/confirmar/preferencia-id=<int:id_preferencia>', ComprarConfirmar.as_view(), name='comprar_confirmar'),
+    path('comprar/resultado/<str:resultado>', ComprarResultadoVista.as_view(), name='comprar_resultado'),
     path('comprar/carrito', ComprarCarritoVista.as_view(), name='comprar_carrito'),
     path('comprar/mercadopago/<int:usuario>', csrf_exempt(ComprarMercadoPagoVista.as_view()), name='comprar_mp'),
     path('carrito', CarritoVista.as_view(), name='carrito'),
     path('carrito/agregar/<int:id_producto>-<int:cantidad>', AgregarCarritoVista.as_view(), name='agregar_carrito'),
     path('carrito/actualizar/<int:id_producto>-<int:cantidad>', ActualizarCarritoVista.as_view(), name='actualizar_carrito'),
     path('carrito/eliminar/<int:id_carrito>', EliminarCarritoVista.as_view(), name='quitar_carrito'),
+    path('administrar/usuarios', AdministrarUsuariosVista.as_view(), name='administrar_usuarios'),
+    path('administrar/crear/usuario', AdministrarCrearUsuarioVista.as_view(), name='administrar_crear_usuario'),
+    path('administrar/editar/usuario/<int:pk>', AdministrarEditarUsuarioVista.as_view(), name='administrar_editar_usuario'),
+    path('administrar/usuarios/eliminar/<int:pk>', AdministrarUsuariosEliminarVista.as_view(), name='administrar_usuarios_eliminar'),
+    path('administrar/panel', AdministrarPanelVista.as_view(), name='administrar_panel'),
+    path('administrar/pedidos', AdministrarPedidosVista.as_view(), name='administrar_pedidos'),
+    path('administrar/pedido/pedido-id=<int:id_pedido>', AdministrarPedidoDetalleVista.as_view(), name='administrar_pedido_detalle'),
+    path('administrar/pedido/eliminar-pedido/<int:pk>', EliminarPedidoVista.as_view(), name='administrar_pedido_eliminar'),
     path('administrar/productos', AdministrarProductosVista.as_view(), name='administrar_productos'),
     path('administrar/productos/agregar_producto', CrearProductoVista.as_view(), name= 'agregar_producto'),
     path('administrar/productos/editar_producto/<int:pk>', ActualizarProductoVista.as_view(), name='editar_producto'),
     path('administrar/productos/eliminar_producto/<int:pk>', EliminarProductoVista.as_view(), name='eliminar_producto'),   
+    path('administrar/categorias', AdministrarCategoriasVista.as_view(), name='administrar_categorias'),   
+    path('administrar/categorias/agregar-categoria', AdministrarCrearCategoriaVista.as_view(), name='administrar_categoria_agregar'),   
+    path('administrar/categorias/editar-categoria/<int:pk>', AdministrarEditarCategoriaVista.as_view(), name='administrar_categoria_editar'),   
+    path('administrar/categorias/eliminar-categoria/<int:pk>', AdministrarCategoriaEliminarVista.as_view(), name='administrar_categoria_eliminar'),   
+    path('administrar/marcas', AdministrarMarcasVista.as_view(), name='administrar_marcas'),   
+    path('administrar/marcas/agregar-marca', AdministrarMarcaCrearVista.as_view(), name='administrar_marcas_agregar'),   
+    path('administrar/marcas/editar-marca/<int:pk>', AdministrarMarcaEditarVista.as_view(), name='administrar_marcas_editar'),   
+    path('administrar/marcas/eliminar-marca/<int:pk>', AdministrarMarcaEliminarVista.as_view(), name='administrar_marcas_eliminar'),   
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
