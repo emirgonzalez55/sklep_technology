@@ -19,23 +19,14 @@
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
-  .form-product {
-    padding: 1rem;
-    text-align: center;
-  }
-  .form-product input,textarea,select {
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+
+  input,textarea,select {
+    margin-bottom: 0;
   }
   footer {
     margin-top: auto;
     padding-left: 1%;
     padding-right: 1%;
-  }
-  table{
-    max-width: 960px;
-    margin: auto;
   }
   nav{
     margin-bottom: 1%;
