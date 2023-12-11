@@ -1,12 +1,12 @@
 {% extends "base/base.html" %}
 {% block titulo %} Carrito  {% endblock %}
 {% block contenido %}  
-  <div class="container border border-2 rounded" id="carrito">
-    <h3>Carrito de compras</h3>
+  <div class="container shadow rounded bg-body-tertiary" id="carrito">
+    <h4>Carrito de compras</h4>
     {% if not carrito_productos %}
     <div class="text-center m-1">
       <img class="mb-4 img-fluid" src="static/img/carrito.png" alt="" width="100" height="100">
-      <h4>Busca productos para agregar al carrito</h4>
+      <h5>Busca productos para agregar al carrito</h5>
     </div>
     {% endif %}
     {% for carrito in carrito_productos %}

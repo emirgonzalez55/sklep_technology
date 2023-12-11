@@ -2,8 +2,9 @@
 {% block titulo %} Compras {% endblock %}
 {% block contenido %}  
 
-<div class="container">
+<div class="container shadow rounded bg-body-tertiary">
 <h4>Compras</h4>
+{% if pedidos %}
 {% for pedido in pedidos %}
 <div class="row mb-1 border ">
     <div class="d-flex justify-content-between">
@@ -23,6 +24,14 @@
     {% endfor %}
 </div>
 {% endfor %}
+{% else %}
+<div class="text-center m-1">
+    <img class="mb-4 img-fluid" src="static/img/carrito.png" alt="" width="100" height="100">
+    <h5>Todavía no compraste.</h5>
+    <h6>¡Haz tu primera compra!</h6>
+    <a class="btn btn-primary btn-sm" href="{% url 'productos' %}">Productos</a>
+  </div>
+{% endif %}
 </div>
 {% endblock %}
 
