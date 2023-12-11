@@ -54,7 +54,9 @@
               </a>
               <ul class="dropdown-menu text-small">
                 <li><a class="dropdown-item" href="#">{{request.user.groups.get.name}}: {{ request.user.usuario }}</a></li>
-                <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
+                <li><a class="dropdown-item" href="{% url 'compras' %}">Mis compras</a></li>
+                <li><a class="dropdown-item" href="{% url 'carrito' %}">Carrito de compras</a></li>
+                <li><a class="dropdown-item" href="{% url 'perfil' %}">Mi cuenta</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/logout">Cerrar sesión</a></li>
                 <li>
