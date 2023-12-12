@@ -1,6 +1,6 @@
 from django.urls import path
 # from . import views
-from aplicacion.views import InicioVista, RegistroVista, LoguutVista, CrearProductoVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,ActualizarProductoVista,EliminarProductoVista,LoginVista,DetalleProductoVista,ComprarMetodoPagoVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista,ComprarCarritoVista,ComprarMercadoPagoVista,ComprarPagoCuotasVista,ComprarConfirmar,ComprasVista,ComprarResultadoVista,AdministrarPanelVista,AdministrarPedidosVista,AdministrarPedidoDetalleVista,EliminarPedidoVista,CompraDetalleVista,PerfilEditarVista,PerfilCambiarPasswordVista,PerfilVista,AdministrarUsuariosVista,AdministrarCrearUsuarioVista,AdministrarEditarUsuarioVista,AdministrarCategoriasVista,AdministrarMarcasVista,AdministrarCrearCategoriaVista,AdministrarEditarCategoriaVista,AdministrarCategoriaEliminarVista,AdministrarMarcaCrearVista,AdministrarMarcaEditarVista,AdministrarMarcaEliminarVista,AdministrarUsuariosEliminarVista
+from aplicacion.views import InicioVista, RegistroVista, LoguutVista, AdministrarProductosCrearVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,AdministrarProductosEditarVista,AdministrarProductosEliminarVista,LoginVista,DetalleProductoVista,ComprarMetodoPagoVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista,ComprarCarritoVista,ComprarMercadoPagoVista,ComprarPagoCuotasVista,ComprarConfirmar,ComprasVista,ComprarResultadoVista,AdministrarPanelVista,AdministrarPedidosVista,AdministrarPedidoDetalleVista,AdministrarPedidoEliminarVista,CompraDetalleVista,PerfilEditarVista,PerfilCambiarPasswordVista,PerfilVista,AdministrarUsuariosVista,AdministrarCrearUsuarioVista,AdministrarEditarUsuarioVista,AdministrarCategoriasVista,AdministrarMarcasVista,AdministrarCategoriasCrearVista,AdministrarCategoriasEditarVista,AdministrarCategoriasEliminarVista,AdministrarMarcasCrearVista,AdministrarMarcasEditarVista,AdministrarMarcasEliminarVista,AdministrarUsuariosEliminarVista
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -35,18 +35,18 @@ urlpatterns = [
     path('administrar/panel', AdministrarPanelVista.as_view(), name='administrar_panel'),
     path('administrar/pedidos', AdministrarPedidosVista.as_view(), name='administrar_pedidos'),
     path('administrar/pedido/pedido-id=<int:id_pedido>', AdministrarPedidoDetalleVista.as_view(), name='administrar_pedido_detalle'),
-    path('administrar/pedido/eliminar-pedido/<int:pk>', EliminarPedidoVista.as_view(), name='administrar_pedido_eliminar'),
+    path('administrar/pedido/eliminar-pedido/<int:pk>', AdministrarPedidoEliminarVista.as_view(), name='administrar_pedido_eliminar'),
     path('administrar/productos', AdministrarProductosVista.as_view(), name='administrar_productos'),
-    path('administrar/productos/agregar_producto', CrearProductoVista.as_view(), name= 'agregar_producto'),
-    path('administrar/productos/editar_producto/<int:pk>', ActualizarProductoVista.as_view(), name='editar_producto'),
-    path('administrar/productos/eliminar_producto/<int:pk>', EliminarProductoVista.as_view(), name='eliminar_producto'),   
+    path('administrar/productos/agregar_producto', AdministrarProductosCrearVista.as_view(), name= 'agregar_producto'),
+    path('administrar/productos/editar_producto/<int:pk>', AdministrarProductosEditarVista.as_view(), name='editar_producto'),
+    path('administrar/productos/eliminar_producto/<int:pk>', AdministrarProductosEliminarVista.as_view(), name='eliminar_producto'),   
     path('administrar/categorias', AdministrarCategoriasVista.as_view(), name='administrar_categorias'),   
-    path('administrar/categorias/agregar-categoria', AdministrarCrearCategoriaVista.as_view(), name='administrar_categoria_agregar'),   
-    path('administrar/categorias/editar-categoria/<int:pk>', AdministrarEditarCategoriaVista.as_view(), name='administrar_categoria_editar'),   
-    path('administrar/categorias/eliminar-categoria/<int:pk>', AdministrarCategoriaEliminarVista.as_view(), name='administrar_categoria_eliminar'),   
+    path('administrar/categorias/agregar-categoria', AdministrarCategoriasCrearVista.as_view(), name='administrar_categoria_agregar'),   
+    path('administrar/categorias/editar-categoria/<int:pk>', AdministrarCategoriasEditarVista.as_view(), name='administrar_categoria_editar'),   
+    path('administrar/categorias/eliminar-categoria/<int:pk>', AdministrarCategoriasEliminarVista.as_view(), name='administrar_categoria_eliminar'),   
     path('administrar/marcas', AdministrarMarcasVista.as_view(), name='administrar_marcas'),   
-    path('administrar/marcas/agregar-marca', AdministrarMarcaCrearVista.as_view(), name='administrar_marcas_agregar'),   
-    path('administrar/marcas/editar-marca/<int:pk>', AdministrarMarcaEditarVista.as_view(), name='administrar_marcas_editar'),   
-    path('administrar/marcas/eliminar-marca/<int:pk>', AdministrarMarcaEliminarVista.as_view(), name='administrar_marcas_eliminar'),   
+    path('administrar/marcas/agregar-marca', AdministrarMarcasCrearVista.as_view(), name='administrar_marcas_agregar'),   
+    path('administrar/marcas/editar-marca/<int:pk>', AdministrarMarcasEditarVista.as_view(), name='administrar_marcas_editar'),   
+    path('administrar/marcas/eliminar-marca/<int:pk>', AdministrarMarcasEliminarVista.as_view(), name='administrar_marcas_eliminar'),   
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

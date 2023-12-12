@@ -56,7 +56,8 @@ class PerfilEditarVista(LoginRequiredMixin,UpdateView):
         if form.is_valid():
             form.save()
             mensaje = "Perfil editado correctamente"
-            response = JsonResponse({'mensaje':mensaje})
+            usuario = f"Usuario {form.cleaned_data.get('usuario')}"
+            response = JsonResponse({'mensaje':mensaje,'usuario':usuario})
             response.status_code = 201
             return response
         else:
@@ -77,8 +78,9 @@ class PerfilCambiarPasswordVista(LoginRequiredMixin,FormView):
         if form.is_valid():
             form.save()
             update_session_auth_hash(request, form.user)
-            mensaje = "Contraseña cambiada correctamente"
-            response = JsonResponse({'mensaje':mensaje})
+            usuario = f"Usuario {request.user}"
+            mensaje = "Contraseña modificada correctamente"
+            response = JsonResponse({'mensaje':mensaje,'usuario':usuario})
             response.status_code = 201
             return response
         else:
@@ -123,7 +125,7 @@ class AdministrarCrearUsuarioVista(PermissionRequiredMixin,CreateView):
             return response
         
 class AdministrarEditarUsuarioVista(PermissionRequiredMixin,UpdateView):
-    permission_required = 'aplicacion.add_usuario'
+    permission_required = 'aplicacion.change_usuario'
     template_name = "administrar_usuarios_editar.html"
     model = Usuario
     form_class = EditarUsuarioForm
@@ -217,9 +219,54 @@ class AdministrarProductosVista(PermissionRequiredMixin,ListView):
             queryset = queryset.filter(producto_nombre__icontains=buscar)
 
         return queryset
+    
+class AdministrarProductosCrearVista(PermissionRequiredMixin,CreateView):
+    permission_required = 'aplicacion.add_producto'
+    template_name = "administrar_productos_crear.html"
+    model = Producto
+    form_class = ProductForm
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            mensaje = "Producto agregado correctamente"
+            producto = f"Producto {form.cleaned_data.get('producto_nombre')}"
+            response = JsonResponse({'mensaje':mensaje,'producto':producto})
+            response.status_code = 201
+            return response
+        else:
+            error = form.errors
+            response = JsonResponse({'error':error})
+            response.status_code = 400
+            return response
+
+class AdministrarProductosEditarVista(PermissionRequiredMixin,UpdateView):
+    permission_required = 'aplicacion.change_producto'
+    template_name = "administrar_productos_editar.html"
+    model = Producto
+    form_class = ProductForm
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST,request.FILES, instance = self.get_object())
+        if form.is_valid():
+            form.save()
+            mensaje = "Producto editado correctamente"
+            producto = f"Producto {form.cleaned_data.get('producto_nombre')}"
+            response = JsonResponse({'mensaje':mensaje,'producto':producto})
+            response.status_code = 201
+            return response
+        else:
+            error = form.errors
+            response = JsonResponse({'error':error})
+            response.status_code = 400
+            return response
+class AdministrarProductosEliminarVista(PermissionRequiredMixin,DeleteView):
+    permission_required = 'aplicacion.delete_productos'
+    template_name = "administrar_productos_eliminar.html"
+    model = Producto
+    success_url = reverse_lazy('administrar_productos')
 
 class AdministrarCategoriasVista(PermissionRequiredMixin,ListView):
-    permission_required = 'aplicacion.view_producto'
+    permission_required = 'aplicacion.view_productocategoria'
     template_name = "administrar_categorias.html"
     model = ProductoCategoria
     context_object_name = "categorias"
@@ -232,8 +279,8 @@ class AdministrarCategoriasVista(PermissionRequiredMixin,ListView):
 
         return queryset
 
-class AdministrarCrearCategoriaVista(PermissionRequiredMixin,CreateView):
-    permission_required = 'aplicacion.add_producto'
+class AdministrarCategoriasCrearVista(PermissionRequiredMixin,CreateView):
+    permission_required = 'aplicacion.add_productocategoria'
     template_name = "administrar_categorias_crear.html"
     model = ProductoCategoria
     form_class = CategoriaForm
@@ -252,8 +299,8 @@ class AdministrarCrearCategoriaVista(PermissionRequiredMixin,CreateView):
             response.status_code = 400
             return response
         
-class AdministrarEditarCategoriaVista(PermissionRequiredMixin,UpdateView):
-    permission_required = 'aplicacion.change_producto'
+class AdministrarCategoriasEditarVista(PermissionRequiredMixin,UpdateView):
+    permission_required = 'aplicacion.change_productocategoria'
     template_name = "administrar_categorias_editar.html"
     model = ProductoCategoria
     form_class = CategoriaForm
@@ -272,14 +319,14 @@ class AdministrarEditarCategoriaVista(PermissionRequiredMixin,UpdateView):
             response.status_code = 400
             return response
         
-class AdministrarCategoriaEliminarVista(PermissionRequiredMixin,DeleteView):
-    permission_required = 'aplicacion.delete_productos'
+class AdministrarCategoriasEliminarVista(PermissionRequiredMixin,DeleteView):
+    permission_required = 'aplicacion.delete_productocategoria'
     template_name = "administrar_categorias_eliminar.html"
     model = ProductoCategoria
     success_url = reverse_lazy('administrar_categorias')
 
 class AdministrarMarcasVista(PermissionRequiredMixin,ListView):
-    permission_required = 'aplicacion.view_producto'
+    permission_required = 'aplicacion.view_productomarca'
     template_name = "administrar_marcas.html"
     model = ProductoMarca
     context_object_name = "marcas"
@@ -292,9 +339,9 @@ class AdministrarMarcasVista(PermissionRequiredMixin,ListView):
 
         return queryset
 
-class AdministrarMarcaCrearVista(PermissionRequiredMixin,CreateView):
-    permission_required = 'aplicacion.add_producto'
-    template_name = "administrar_marca_crear.html"
+class AdministrarMarcasCrearVista(PermissionRequiredMixin,CreateView):
+    permission_required = 'aplicacion.add_productomarca'
+    template_name = "administrar_marcas_crear.html"
     model = ProductoMarca
     form_class = MarcaForm
     def post(self, request, *args, **kwargs):
@@ -313,9 +360,9 @@ class AdministrarMarcaCrearVista(PermissionRequiredMixin,CreateView):
             response.status_code = 400
             return response
         
-class AdministrarMarcaEditarVista(PermissionRequiredMixin,UpdateView):
-    permission_required = 'aplicacion.change_producto'
-    template_name = "administrar_marca_editar.html"
+class AdministrarMarcasEditarVista(PermissionRequiredMixin,UpdateView):
+    permission_required = 'aplicacion.change_productomarca'
+    template_name = "administrar_marcas_editar.html"
     model = ProductoMarca
     form_class = MarcaForm
     def post(self, request, *args, **kwargs):
@@ -333,9 +380,9 @@ class AdministrarMarcaEditarVista(PermissionRequiredMixin,UpdateView):
             response.status_code = 400
             return response
         
-class AdministrarMarcaEliminarVista(PermissionRequiredMixin,DeleteView):
-    permission_required = 'aplicacion.delete_productos'
-    template_name = "administrar_marca_eliminar.html"
+class AdministrarMarcasEliminarVista(PermissionRequiredMixin,DeleteView):
+    permission_required = 'aplicacion.delete_productomarca'
+    template_name = "administrar_marcas_eliminar.html"
     model = ProductoMarca
     success_url = reverse_lazy('administrar_marcas')
 
@@ -362,7 +409,7 @@ class AdministrarPedidoDetalleVista(PermissionRequiredMixin,View):
             return render(request,'administrar_pedido_detalle.html', {'pedido': pedido,'pedido_detalle': pedido_detalle})
         raise Http404("Página no encontrada")
     
-class EliminarPedidoVista(PermissionRequiredMixin,DeleteView):
+class AdministrarPedidoEliminarVista(PermissionRequiredMixin,DeleteView):
     permission_required = 'aplicacion.delete_pedido'
     template_name = "administrar_pedido_delete.html"
     model = Pedido
@@ -377,52 +424,6 @@ class AdministrarPanelVista(PermissionRequiredMixin,ListView):
         queryset = PedidoDetalle.obtener_pedidos_grafico()
         print(queryset)
         return queryset
-
-class CrearProductoVista(PermissionRequiredMixin,CreateView):
-    permission_required = 'aplicacion.add_producto'
-    template_name = "administrar_productos_crear.html"
-    model = Producto
-    form_class = ProductForm
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            mensaje = "Producto agregado correctamente"
-            producto = f"Producto {form.cleaned_data.get('producto_nombre')}"
-            response = JsonResponse({'mensaje':mensaje,'producto':producto})
-            response.status_code = 201
-            return response
-        else:
-            error = form.errors
-            response = JsonResponse({'error':error})
-            response.status_code = 400
-            return response
-
-class ActualizarProductoVista(PermissionRequiredMixin,UpdateView):
-    permission_required = 'aplicacion.change_producto'
-    template_name = "administrar_productos_editar.html"
-    model = Producto
-    form_class = ProductForm
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST,request.FILES, instance = self.get_object())
-        if form.is_valid():
-            form.save()
-            mensaje = "Producto editado correctamente"
-            producto = f"Producto {form.cleaned_data.get('producto_nombre')}"
-            response = JsonResponse({'mensaje':mensaje,'producto':producto})
-            response.status_code = 201
-            return response
-        else:
-            error = form.errors
-            response = JsonResponse({'error':error})
-            response.status_code = 400
-            return response
-class EliminarProductoVista(PermissionRequiredMixin,DeleteView):
-    permission_required = 'aplicacion.delete_productos'
-    template_name = "delete_producto.html"
-    model = Producto
-    success_url = reverse_lazy('administrar_productos')
-
 
 class ComprarMetodoPagoVista(LoginRequiredMixin,View):
     def get(self, request,producto_slug,cantidad):
@@ -490,7 +491,7 @@ class ComprarMetodoPagoVista(LoginRequiredMixin,View):
 
         # return render(request,'comprar_pago.html', {'producto': producto,'cantidad': cantidad,'form': form})
     
-class ComprarPagoCuotasVista(View):
+class ComprarPagoCuotasVista(LoginRequiredMixin,View):
 
     def get(self, request,id_preferencia):
         print(id_preferencia)
@@ -523,7 +524,7 @@ class ComprarPagoCuotasVista(View):
         raise Http404("Página no encontrada")
 
         
-class ComprarConfirmar(View):
+class ComprarConfirmar(LoginRequiredMixin,View):
 
     def get(self, request,id_preferencia):
         obtener_preferencia = PedidoPreferencia.obtener_preferencia(request,id_preferencia)
@@ -558,7 +559,7 @@ class ComprarConfirmar(View):
         raise Http404("Página no encontrada")
     
 
-class ComprarCarritoVista(View):
+class ComprarCarritoVista(LoginRequiredMixin,View):
     def get(self, request):
         form = PagoForm
         obtener_carrito = CarritoCompra.obtener_carrito(request)
@@ -607,11 +608,11 @@ class ComprarMercadoPagoVista(View):
             Mercado.procesar_respuesta_mp(type,data_id,usuario)
         return HttpResponse(status=200)
     
-class ComprarResultadoVista(View):
+class ComprarResultadoVista(LoginRequiredMixin,View):
     def get(self,request,resultado):
         return render(request,'comprar_resultado.html', {'resultado': resultado})
     
-class ComprasVista(ListView):
+class ComprasVista(LoginRequiredMixin,ListView):
     template_name = "compras.html"
     context_object_name = "pedidos"
     # paginate_by = 10    
@@ -631,7 +632,7 @@ class CompraDetalleVista(LoginRequiredMixin,View):
         
         raise Http404("Página no encontrada")
 
-class AgregarCarritoVista(CreateView):
+class AgregarCarritoVista(LoginRequiredMixin,CreateView):
     def post(self, request, id_producto, cantidad):
         comprobar_carrito_usuario = CarritoCompra.comprobar_carrito_usuario(request, id_producto)
         if comprobar_carrito_usuario:
@@ -645,7 +646,7 @@ class AgregarCarritoVista(CreateView):
             response.status_code = 400
             return response
 
-class ActualizarCarritoVista(UpdateView):
+class ActualizarCarritoVista(LoginRequiredMixin,UpdateView):
     def post(self, request, id_producto, cantidad):
         actualizar_cantidad = CarritoCompra.actualizar_cantidad_producto_carrito(request, id_producto, cantidad)
         if actualizar_cantidad:
@@ -657,7 +658,7 @@ class ActualizarCarritoVista(UpdateView):
             response.status_code = 400
             return response
 
-class EliminarCarritoVista(DeleteView):
+class EliminarCarritoVista(LoginRequiredMixin,DeleteView):
     def post(self, request, id_carrito):
         eliminar_producto_carrito = CarritoCompra.eliminar_producto_carrito(request, id_carrito)
         response = JsonResponse({'response':'response'})

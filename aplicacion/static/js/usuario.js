@@ -5,6 +5,9 @@ function form_editar_perfil(){
         url: $('#form-editar-perfil').attr('action'),
         success: function(response){
             console.log(response);
+            modal_aviso(response.mensaje,response.usuario);
+            modal_cerrar("modal-perfil");
+            recargar_tabla("tabla-perfil");
 
         },
         error: function(error){
@@ -20,7 +23,8 @@ function form_cambiar_password(){
         url: $('#form-cambiar-password').attr('action'),
         success: function(response){
             console.log(response);
-            alert(response.mensaje)
+            modal_aviso(response.mensaje,response.usuario);
+            modal_cerrar("modal-perfil");
         },
         error: function(error){
             console.log(error);
@@ -39,30 +43,6 @@ function form_error(errores,form){
         $("#"+item).append(error); 
     }
 }
-// function error_form_cambiar_password(errores){
-//     $("#old_password").empty();
-//     $("#new_password1").empty();
-//     $("#new_password2").empty();
-//     let error = "";
-//     for (let item in errores.responseJSON.error){
-//         error = '<p>' + errores.responseJSON.error[item] + '</p>';
-//         $("#"+item).append(error); 
-
-//     }
-// }
-// function error_form(errores){
-//     $("#usuario").empty();
-//     $("#email").empty();
-//     $("#nombre").empty();
-//     $("#apellido").empty();
-//     let error = "";
-//     for (let item in errores.responseJSON.error){
-//         error = '<p>' + errores.responseJSON.error[item] + '</p>';
-//         $("#"+item).append(error); 
-
-//     }
-// }
-
 function modal_usuario(url){
     $('#modal-usuario').load(url, function () {
       $(this).modal("show");

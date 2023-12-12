@@ -22,7 +22,7 @@
         </div>
     </div>
  
-    <div class="container">
+    <div class="container" id="tabla-perfil">
     <div class="row justify-content-center my-1">
         <div class="border-top my-1">
             <h5>Usuario: {{ request.user.usuario }}</h5>
@@ -41,6 +41,22 @@
 
 </div>  
 <div class="modal fade" id="modal-perfil"></div>
+<div class="modal fade" id="modal-aviso">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="titulo-aviso"></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="body-aviso"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% load static %}
 <script src="{% static 'js/usuario.js' %}"></script> 
 {% endblock %}
