@@ -1,0 +1,18 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Eliminar producto </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'eliminar_producto' object.id_producto %}"> 
+        {% csrf_token %}
+      <div class="modal-body">
+            <P>¿Está seguro de que desea eliminar el producto {{object.producto_nombre}}?</P>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger" type="submit">Eliminar producto</button>
+      </div>
+    </form>
+    </div>
+</div> 

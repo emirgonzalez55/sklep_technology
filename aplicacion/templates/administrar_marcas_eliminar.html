@@ -1,0 +1,19 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Eliminar marca </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'administrar_marcas_eliminar' object.id_marca %}"> 
+        {% csrf_token %}
+      <div class="modal-body">
+            <span>¿Estás seguro de que deseas eliminar la marca {{object.marca_nombre}}?</span>
+            <P class="form-text">Ten en cuenta que se quitara la marca de todos los productos que la tengan asignada</P>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger" type="submit">Eliminar marca</button>
+      </div>
+    </form>
+    </div>
+</div> 

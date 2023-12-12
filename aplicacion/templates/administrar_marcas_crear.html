@@ -1,0 +1,29 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Agregar marca</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" id="form-marca" action="{% url 'administrar_marcas_agregar' %}"> 
+        {% csrf_token %}
+      <div class="modal-body">
+        <div class="row my-1">
+          <div class="col">
+            {{form.marca_nombre}}
+            <span class="form-text" id="marca_nombre"></span>
+          </div>
+        </div>
+        <div class="row my-1">
+          <div class="col">
+            {{form.marca_descripcion}}
+            <span class="form-text" id="marca_descripcion"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary" type="button" onclick="form_marcas()">Agregar marca</button>
+      </div>
+    </form>
+    </div>
+  </div> 
