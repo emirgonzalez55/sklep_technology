@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 border-top">
-        <div class="col">
+        <div class="col my-1">
             <h5>Medio de pago</h5>
             <ul class="list-group">
                 {% if pedido.pedido_datos.tarjeta_datos %}
@@ -25,11 +25,10 @@
                 {% endif %}
                 {% if pedido.pedido_datos.mercadopago %}
                 <li class="list-group-item"><img src="{{ pedido.pedido_datos.mercadopago.imagen }}" alt="" class="img-fluid me-1" width="50">Pagaste con Mercado Pago</li>
-
                 {% endif %}
             </ul>
         </div>
-        <div class="col">
+        <div class="col my-1">
             <h5>Detalle</h5>
             <div class="d-flex justify-content-between">
                 {% if pedido_detalle|length == 1%}
@@ -54,7 +53,7 @@
                 <p>Total: </p>
                 <p>{{ pedido.pedido_datos.tarjeta_datos.cuotas.cuotas }}x $ {{pedido.pedido_datos.tarjeta_datos.cuotas.total_cuota }}</p>
                 {% else %}
-                <p>Total:</h6>
+                <p>Total:</p>
                 <p>$ {{pedido_detalle.total }}</p>
                 {% endif %}
             </div>

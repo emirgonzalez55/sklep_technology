@@ -20,8 +20,12 @@ class LoginVista(LoginView):
     form_class = LoginForm
     redirect_authenticated_user=True
 
-class InicioVista(TemplateView):
+class InicioVista(ListView):
     template_name = "inicio.html"
+    model = Producto
+    context_object_name = "productos"
+    queryset = Producto.objects.all().order_by("producto_nombre")[:12]
+    print(queryset)
 
 class RegistroVista(CreateView):
     template_name = "registro.html"
@@ -39,7 +43,7 @@ class RegistroVista(CreateView):
         else:
             return render(request,'registro.html', {'form': form_registro})
 
-class LoguutVista(LogoutView):
+class LogoutVista(LogoutView):
     next_page ="inicio"
 
 class PerfilVista(LoginRequiredMixin,TemplateView):
@@ -155,13 +159,14 @@ class ProductosVista(ListView):
     template_name = "productos.html"
     model = Producto
     context_object_name = "productos"
-    queryset = Producto.objects.all()
+    queryset = Producto.objects.all().order_by("producto_nombre")
+    paginate_by = 10
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.kwargs:
             filtro = self.kwargs["filtro"]
             valor = self.kwargs["valor"]
-
+            
             if filtro == "categoria":
                 queryset = queryset.filter(categoria__slug=valor)
             if filtro == "marca":
@@ -191,11 +196,6 @@ class BuscarProductosVista(ListView):
             precio_min = self.request.GET.get('precio_min')
             precio_max = self.request.GET.get('precio_max')
             precio_rango = None
-            # if precio_min and precio_max:
-            #     precio_rango = tuple(sorted((precio_min, precio_max)))
-            #     print(tuple(sorted((precio_min, precio_max))))
-            #     precio_min = None
-            #     precio_max = None
 
             queryset = Producto.buscar_productos(producto_nombre__icontains=consulta,categoria__categoria_nombre=categoria,marca__marca_nombre=marca,precio_unitario__range=precio_rango,precio_unitario__gte=precio_min,precio_unitario__lte=precio_max)
             queryset.consulta = consulta
@@ -203,7 +203,6 @@ class BuscarProductosVista(ListView):
             queryset.marca = marca
             queryset.precio_min = precio_min
             queryset.precio_max = precio_max
-            # queryset.precio_rango = precio_rango
             return queryset
         
 class AdministrarProductosVista(PermissionRequiredMixin,ListView):
@@ -439,14 +438,13 @@ class ComprarMetodoPagoVista(LoginRequiredMixin,View):
         raise Http404("Producto no encontrado")
 
     def post(self, request,producto_slug,cantidad):
-        # producto = Producto.obtener_producto(slug=producto_slug)
         form = PagoForm(request.POST or None)
         id_preferencia = request.POST.get("preferencia-id")
         if form.is_valid():
             check_tarjeta = Tarjeta.check_tarjeta(form)
             if check_tarjeta:
                 actulizar_preferencia = PedidoPreferencia.actulizar_preferencia(request,id_preferencia,tarjeta=check_tarjeta)
-                print("Tarjeta válida")
+                # print("Tarjeta válida")
                 if actulizar_preferencia:
                     if check_tarjeta.tipo == "credito":
                         print(check_tarjeta.tipo)
@@ -460,9 +458,10 @@ class ComprarMetodoPagoVista(LoginRequiredMixin,View):
                         response.status_code = 201
                         return response
             else:
-                print("Tarjeta inválida")  
-                error = ""
-                response = JsonResponse({'error': error})
+                # print("Tarjeta inválida") 
+                mensaje = "Método de pago" 
+                error = "El medio de pago ingresado no es válido"
+                response = JsonResponse({'error': error,'mensaje': mensaje})
                 response.status_code = 404
                 return response
         else:
@@ -470,26 +469,6 @@ class ComprarMetodoPagoVista(LoginRequiredMixin,View):
             response = JsonResponse({'error': error})
             response.status_code = 404
             return response
-
-                # comprobar_stock = Producto.comprobar_stock(producto=producto, cantidad=cantidad)
-                # if comprobar_stock:
-                #     print("Hay stock disponible")
-                #     crear_pedido = Pedido.crear_pedido(request, producto=producto, cantidad=cantidad)
-                #     if crear_pedido:
-                #         print("Pedido creado correctamente")
-                #         response = JsonResponse({'response':"response"})
-                #         response.status_code = 201
-                #         return response
-                #     else:
-                #         print("Error al procesar pedido")
-                # else: 
-                #     print("No hay stock disponible")
-                #     response = JsonResponse({'response':"response"})
-                #     response.status_code = 404
-                #     return response
-  
-
-        # return render(request,'comprar_pago.html', {'producto': producto,'cantidad': cantidad,'form': form})
     
 class ComprarPagoCuotasVista(LoginRequiredMixin,View):
 
@@ -502,8 +481,8 @@ class ComprarPagoCuotasVista(LoginRequiredMixin,View):
                 if preferencia["tarjeta_datos"].get("tipo") == "credito":
                     tarjeta_cuotas = preferencia["tarjeta_cuotas"]
                     tarjeta_datos = preferencia["tarjeta_datos"]
-                    print(preferencia["tarjeta_datos"])
-                    print(preferencia["tarjeta_cuotas"])
+                    # print(preferencia["tarjeta_datos"])
+                    # print(preferencia["tarjeta_cuotas"])
 
                     return render(request,'comprar_cuotas.html',{'tarjeta_cuotas':tarjeta_cuotas,'tarjeta_datos':tarjeta_datos,'preferencia':preferencia})
 
@@ -578,7 +557,7 @@ class ComprarCarritoVista(LoginRequiredMixin,View):
             check_tarjeta = Tarjeta.check_tarjeta(form)
             if check_tarjeta:
                 actulizar_preferencia = PedidoPreferencia.actulizar_preferencia(request,id_preferencia,tarjeta=check_tarjeta)
-                print("Tarjeta válida")
+                # print("Tarjeta válida")
                 if actulizar_preferencia:
                     if check_tarjeta.tipo == "credito":
                         print(check_tarjeta.tipo)
@@ -592,12 +571,12 @@ class ComprarCarritoVista(LoginRequiredMixin,View):
                         response.status_code = 201
                         return response
             else:
-                print("Tarjeta inválida")  
-        # parametro_productos = request.POST.get("productos")
-        # productos_lista = Pedido.procesar_parametro(parametro_productos)
-        # productos = Producto.obtener_producto(productos_lista=productos_lista)
-        # Pedido.crear_pedido_carrito(request, productos=productos)
-        # return render(request,'comprar_pago.html')
+                mensaje = "Método de pago" 
+                error = "El medio de pago ingresado no es válido"
+                response = JsonResponse({'error': error,'mensaje': mensaje})
+                response.status_code = 404
+                return response
+
 
 
 class ComprarMercadoPagoVista(View):

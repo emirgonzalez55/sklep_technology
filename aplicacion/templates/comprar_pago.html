@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {% block titulo %} Comprar {% endblock %}
 {% block contenido %}  
-<div class="accordion container  p-0" id="accordion">
+<div class="accordion container p-0" id="accordion">
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingOne">
       <button class="accordion-button bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -66,7 +66,7 @@
         </div>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between border mt-2 ">
           <div class="col mb-1 mt-1">
-            <h4>Total a pagar: $ {{ preferencia.preferencia_datos.total }}</h4>
+            <h5>Total a pagar: $ {{ preferencia.preferencia_datos.total }}</h5>
           </div>
           <div class="col d-grid gap-2 mb-1 mt-1">
             <button type="button" class="btn btn-primary disabled" id="comprar-metodo-pago" onclick="comprar_metodo_pago()">Continuar</button>
@@ -86,7 +86,7 @@
       <div class="container">
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between align-items-center"> 
           <div class="col m-1">
-            <h4>Total a pagar: $ {{ preferencia.preferencia_datos.total }}</h4>
+            <h5>Total a pagar: $ {{ preferencia.preferencia_datos.total }}</h5>
           </div>
           <div class="col">
             <div id="wallet_container"></div>
@@ -97,10 +97,10 @@
   </div>
 </div>
 
-<div class="container border rounded mt-2">
-  <h4>Productos</h4>
+<div class="container shadow rounded bg-body-tertiary my-2">
+  <h5>Productos</h5>
   {% for producto in productos %}
-  <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center border border-2 justify-content-between mb-1 g-0">
+  <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center border-top justify-content-between mb-1 g-0">
     <div class="col-md-6 d-flex align-items-center">
       <img src="{{ producto.imagen.url}}" alt="" class="img-fluid " width="100">
       <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
@@ -112,30 +112,6 @@
   </div>
   {% endfor %}
 </div>
-  <!-- <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto border rounded align-items-center d-flex justify-content-between mb-1">
-    {% if producto %}
-    <div class="col col-md-3 d-flex align-items-center">
-      <img src="{{ producto.imagen.url}}" alt="" class="img-fluid m-1" width="100">
-      <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
-    </div>
-    <div class="col col-md-3">
-      <p class="m-1">Cantidad: {{ cantidad }} | Precio unitario: $ {{producto.precio_unitario}}</p>
-    </div>
-    {% endif %}
-    {% if carrito_compra %}
-    {% for carrito in  carrito_compra %}
-    {% if carrito.cantidad %}
-    <div class="col col-md-9 d-flex align-items-center">
-      <img src="{{ carrito.producto.imagen.url}}" alt="" class="img-fluid m-1" width="100">
-      <p class="text-truncate m-1">{{ carrito.producto.producto_nombre}}</p>
-    </div>
-    <div class="col col-md-3">
-      <p class="m-1">Cantidad: {{ carrito.cantidad }} | Precio unitario: $ {{carrito.producto.precio_unitario}}</p>
-    </div>
-    {% endif %}
-    {% endfor %}
-    {% endif %}
-  </div> -->
 
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
@@ -155,18 +131,8 @@
   </div>
 </div>
 
-<!-- <div class="modal fade" id="modal-comprar" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body d-flex justify-content-center">
-        <span class="spinner-border me-1" role="status" aria-hidden="true"></span>
-        <h1 class="modal-title fs-5">Procesando</h1>
-      </div>
-    </div>
-  </div>
-</div> -->
 
-<!-- <div class="modal fade" id="modal-aviso-compra">
+<div class="modal fade" id="modal-aviso-compra">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -181,5 +147,5 @@
       </div>
     </div>
   </div>
-</div> -->
+</div>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.urls import path
 # from . import views
-from aplicacion.views import InicioVista, RegistroVista, LoguutVista, AdministrarProductosCrearVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,AdministrarProductosEditarVista,AdministrarProductosEliminarVista,LoginVista,DetalleProductoVista,ComprarMetodoPagoVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista,ComprarCarritoVista,ComprarMercadoPagoVista,ComprarPagoCuotasVista,ComprarConfirmar,ComprasVista,ComprarResultadoVista,AdministrarPanelVista,AdministrarPedidosVista,AdministrarPedidoDetalleVista,AdministrarPedidoEliminarVista,CompraDetalleVista,PerfilEditarVista,PerfilCambiarPasswordVista,PerfilVista,AdministrarUsuariosVista,AdministrarCrearUsuarioVista,AdministrarEditarUsuarioVista,AdministrarCategoriasVista,AdministrarMarcasVista,AdministrarCategoriasCrearVista,AdministrarCategoriasEditarVista,AdministrarCategoriasEliminarVista,AdministrarMarcasCrearVista,AdministrarMarcasEditarVista,AdministrarMarcasEliminarVista,AdministrarUsuariosEliminarVista
+from aplicacion.views import InicioVista, RegistroVista, LogoutVista, AdministrarProductosCrearVista,AdministrarProductosVista, ProductosVista,BuscarProductosVista,AdministrarProductosEditarVista,AdministrarProductosEliminarVista,LoginVista,DetalleProductoVista,ComprarMetodoPagoVista,AgregarCarritoVista,CarritoVista,ActualizarCarritoVista, EliminarCarritoVista,ComprarCarritoVista,ComprarMercadoPagoVista,ComprarPagoCuotasVista,ComprarConfirmar,ComprasVista,ComprarResultadoVista,AdministrarPanelVista,AdministrarPedidosVista,AdministrarPedidoDetalleVista,AdministrarPedidoEliminarVista,CompraDetalleVista,PerfilEditarVista,PerfilCambiarPasswordVista,PerfilVista,AdministrarUsuariosVista,AdministrarCrearUsuarioVista,AdministrarEditarUsuarioVista,AdministrarCategoriasVista,AdministrarMarcasVista,AdministrarCategoriasCrearVista,AdministrarCategoriasEditarVista,AdministrarCategoriasEliminarVista,AdministrarMarcasCrearVista,AdministrarMarcasEditarVista,AdministrarMarcasEliminarVista,AdministrarUsuariosEliminarVista
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -8,7 +8,7 @@ urlpatterns = [
     path('', InicioVista.as_view(), name='inicio'),
     path('login', LoginVista.as_view(), name='login'),
     path('registro', RegistroVista.as_view(), name='registro'),
-    path('logout', LoguutVista.as_view(), name='logout'),
+    path('logout', LogoutVista.as_view(), name='logout'),
     path('perfil', PerfilVista.as_view(), name='perfil'),
     path('perfil/editar', PerfilEditarVista.as_view(), name= 'perfil_editar'),
     path('perfil/cambiar-password', PerfilCambiarPasswordVista.as_view(), name='perfil_cambiar_password'),

@@ -17,12 +17,17 @@
         <div class="col">
             <h5>Medio de pago</h5>
             <ul class="list-group">
+                {% if pedido.pedido_datos.tarjeta_datos %}
                 <li class="list-group-item"><img src="{{ pedido.pedido_datos.tarjeta_datos.imagen }}" alt="" class="img-fluid me-1" width="50">{{ pedido.pedido_datos.tarjeta_datos.red }} terminada en {{pedido.pedido_datos.tarjeta_datos.tarjeta_numero|stringformat:"d"|slice:"12:16"}}</li>
                 {% if pedido.pedido_datos.tarjeta_datos.cuotas %}
                 <li class="list-group-item">Cuotas: {{ pedido.pedido_datos.tarjeta_datos.cuotas.cuotas }}x $ {{pedido.pedido_datos.tarjeta_datos.cuotas.total_cuota }}</li>
                 <li class="list-group-item">Total financiado: $ {{pedido.pedido_datos.tarjeta_datos.cuotas.total_interes }}</li>
                 {% else %}
                 <li class="list-group-item">Total debitado: $ {{pedido_detalle.total }}</li>
+                {% endif %}
+                {% endif %}
+                {% if pedido.pedido_datos.mercadopago %}
+                <li class="list-group-item"><img src="{{ pedido.pedido_datos.mercadopago.imagen }}" alt="" class="img-fluid me-1" width="50">Pagado con Mercado Pago</li>
                 {% endif %}
             </ul>
         </div>

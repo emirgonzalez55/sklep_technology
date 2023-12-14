@@ -32,7 +32,7 @@
       <tr>
         <th scope="row">{{ producto.id_producto }}</th>
         <td><img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100"></td>
-        <td>{{ producto.producto_nombre }}</td>
+        <td><a class="link-body-emphasis text-decoration-none" href="{% url 'producto_detalle' producto.slug %}">{{ producto.producto_nombre }}</a></td>
         <td>{{ producto.categoria }}</td>
         <td>$ {{ producto.precio_unitario }}</td>
         <td>{{ producto.unidades_stock }}</td>

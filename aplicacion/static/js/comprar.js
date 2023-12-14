@@ -93,52 +93,35 @@ function validaciones_color_invalid(input) {
     }
 }
 function comprobar_form_metodo_pago(){
-    nombre_valid = /^\w{1,100}$/;
+    nombre_valid = /\w{1,100}\s*/;
     tarjeta_valid = /^\d{15,16}$/;
     dni_valid = /^\d{1,8}$/;
     fecha_valid = /^\d{4,4}$/;
     codigo_valid = /^\d{3,4}$/;
     var inputs = document.querySelectorAll("#form-metodo-pago input");
-    var resultado = null
-    // inputs.forEach(input => {
-    //     // console.log(input.name);
-    //     // if (input.value.length != 0) {
-    //     //     resultado = false
-    //     // }
-    //     if (input.name == "tarjeta_numero") {
-    //         if (!tarjeta_valid.test(input.value)) {
-    //             validaciones_color_invalid(input)
-    //             resultado = false
-    //         }else{
-    //             validaciones_color_valid(input)
-    //         }
-    //     }
-    // });
+    var nombre = document.getElementById("id_tarjeta_titular");
+    var tarjeta = document.getElementById("id_tarjeta_numero");
+    var dni = document.getElementById("id_dni");
+    var tarjeta_fecha = document.getElementById("id_tarjeta_fecha");
+    var tarjeta_codigo = document.getElementById("id_tarjeta_codigo");
+    var boton = document.getElementById("comprar-metodo-pago")
 
-    const validar = input => {
-        console.log(input.target.name)
-        resultado = false
-        return resultado
+    if (nombre_valid.test(nombre.value) && tarjeta_valid.test(tarjeta.value) && dni_valid.test(dni.value) && fecha_valid.test(tarjeta_fecha.value) && codigo_valid.test(tarjeta_codigo.value)) {
+        if (boton.classList.contains("disabled")) {
+            boton.classList.toggle("disabled");
+        }
+    }else{
+        if (!boton.classList.contains("disabled")) {
+            boton.classList.add("disabled");
+        }
     }
+  
 
-    // for (const element in inputs) {
-    //     const input = inputs[element];
-    //     console.log(input)
-    //     input.addEventListener("blur", function() {
-    //         console.log(input.name);
-
-    //     });
-
-    //     // console.log(input)
-
-    // }
-    document.getElementById("comprar-metodo-pago").classList.toggle("disabled");
     inputs.forEach(input => {
         input.addEventListener("blur", function() {
             if (input.name == "tarjeta_numero") {
                 if (!tarjeta_valid.test(input.value)) {
                     validaciones_color_invalid(input)
-                    resultado = false
                 }else{
                     validaciones_color_valid(input)
                 }
@@ -146,7 +129,6 @@ function comprobar_form_metodo_pago(){
             if (input.name == "dni") {
                 if (!dni_valid.test(input.value)) {
                     validaciones_color_invalid(input)
-                    resultado = false
                 }else{
                     validaciones_color_valid(input)
                 }
@@ -154,7 +136,6 @@ function comprobar_form_metodo_pago(){
             if (input.name == "tarjeta_fecha") {
                 if (!fecha_valid.test(input.value)) {
                     validaciones_color_invalid(input)
-                    resultado = false
                 }else{
                     validaciones_color_valid(input)
                 }
@@ -162,7 +143,6 @@ function comprobar_form_metodo_pago(){
             if (input.name == "tarjeta_codigo") {
                 if (!codigo_valid.test(input.value)) {
                     validaciones_color_invalid(input)
-                    resultado = false
                 }else{
                     validaciones_color_valid(input)
                 }
@@ -170,7 +150,6 @@ function comprobar_form_metodo_pago(){
             if (input.name == "tarjeta_titular") {
                 if (!nombre_valid.test(input.value)) {
                     validaciones_color_invalid(input)
-                    resultado = false
                 }else{
                     validaciones_color_valid(input)
                 }
@@ -178,30 +157,6 @@ function comprobar_form_metodo_pago(){
         });
 
     });
-
-
-    // console.log("Esto es hola "+hola+"")
-    return resultado
-    // var resultado = false
-    // nombre_titular = document.getElementById("id_tarjeta_titular")
-    // dni = document.getElementById("id_dni")
-    // tarjeta_numero = document.getElementById("id_tarjeta_numero")
-    // if (!tarjeta_valid.test(tarjeta_numero.value)) {
-    //     validaciones_color_invalid(tarjeta_numero)
-    // }else{
-    //     validaciones_color_valid(tarjeta_numero)
-    // }
-    // // if (dni.value == "") {
-    // //     dni.classList.toggle("is-invalid");
-    // // }
-    // // if (nombre_titular.value == "") {
-    // //     nombre_titular.classList.toggle("is-invalid");
-    // //     resultado = false
-    // // }else{
-    // //     nombre_titular.classList.toggle("is-valid");
-    // //     resultado = true
-    // // }
-    // return resultado
 }
 function comprar_metodo_pago(){
     mostrar_modal("modal-cargar")
@@ -220,8 +175,10 @@ function comprar_metodo_pago(){
             console.log(error);
             setTimeout(() => {
                 cerrar_modal("modal-cargar")
-                error_form(error)
+                // error_form(error);
+                modal_aviso(error.responseJSON.mensaje,error.responseJSON.error);
             }, 1000);
+            
         }
     });
 }
@@ -285,4 +242,11 @@ function comprar_confirmar(){
             }, 1500);
         }
     });
+}
+function modal_aviso(mensaje,error){
+    $("#titulo-aviso").empty();
+    $("#body-aviso").empty();
+    $("#modal-aviso-compra").modal("show");	
+    $("#titulo-aviso").append(mensaje); 
+    $("#body-aviso").append(error); 
 }

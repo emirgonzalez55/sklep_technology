@@ -1,25 +1,26 @@
 {% extends "base/base.html" %}
 {% block titulo %} Confirmar compra {% endblock %}
 {% block contenido %}  
-<div class="container border border-2 rounded">
+<div class="container shadow rounded bg-body-tertiary">
     <h4>Confirmar compra</h4>
     <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2">
-        <div class="col">
+        <div class="col my-1">
             <div class="">
                 <h5>Medio de pago</h5>
                 <div class="">
                     <ul class="list-group">
                         <li class="list-group-item"><img src="{{ preferencia.tarjeta_datos.imagen }}" alt="" class="img-fluid me-1" width="50">{{ preferencia.tarjeta_datos.red }} terminada en {{preferencia.tarjeta_datos.tarjeta_numero|stringformat:"d"|slice:"12:16"}}</li>
                         {% if preferencia.tarjeta_datos.cuotas %}
-                        <li class="list-group-item">{{ preferencia.tarjeta_datos.cuotas.cuotas }}x $ {{preferencia.tarjeta_datos.cuotas.total_cuota }}</li>
+                        <li class="list-group-item">Cuotas: {{ preferencia.tarjeta_datos.cuotas.cuotas }}x $ {{preferencia.tarjeta_datos.cuotas.total_cuota }}</li>
+                        <li class="list-group-item">Total financiado: $ {{ preferencia.tarjeta_datos.cuotas.total_interes }}</li>
                         {% else %}
-                        <li class="list-group-item">$ {{ preferencia.total }}</li>
+                        <li class="list-group-item">Total a debitar: $ {{ preferencia.total }}</li>
                         {% endif %}
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col my-1">
             <form method="post" id="form-comprar-confirmar">
                 {% csrf_token %}
             </form>
@@ -43,15 +44,15 @@
                 <p>$ {{preferencia.total }}</p>
                 {% endif %}
             </div>
-            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between mb-1">
-                <div class="col ">
+            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto justify-content-between ">
+                <div class="col fw-bold">
                     {% if preferencia.tarjeta_datos.cuotas %}
-                    <h4>Total a pagar: {{ preferencia.tarjeta_datos.cuotas.cuotas }}x $ {{preferencia.tarjeta_datos.cuotas.total_cuota }}</h4>
+                    <p>Total a pagar: {{ preferencia.tarjeta_datos.cuotas.cuotas }}x $ {{preferencia.tarjeta_datos.cuotas.total_cuota }}</p>
                     {% else %}
-                    <h4>Total a pagar: $ {{preferencia.total }}</h4>
+                    <p>Total a pagar: $ {{preferencia.total }}</p>
                     {% endif %}
                 </div>
-                <div class="col  d-grid gap-2">
+                <div class="col">
                     <button type="button" class="btn btn-primary" onclick="comprar_confirmar()">Comprar</button>
                 </div>
             </div>
@@ -59,10 +60,10 @@
         </div>
     </div>
 </div>
-<div class="container border border-2 rounded my-2">
+<div class="container shadow rounded bg-body-tertiary my-2">
     <h5>Productos</h5>
     {% for producto in productos %}
-    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center d-flex border justify-content-between mb-1 g-0">
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center d-flex border-top justify-content-between mb-1 g-0">
         <div class="col-md-6 d-flex align-items-center">
             <img src="{{ producto.imagen.url}}" alt="" class="img-fluid " width="100">
             <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>

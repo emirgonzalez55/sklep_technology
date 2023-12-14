@@ -2,16 +2,15 @@
 {% block titulo %} Compras {% endblock %}
 {% block contenido %}  
 
-<div class="container shadow rounded bg-body-tertiary">
+<div class="container shadow rounded bg-body-tertiary my-1">
 <h4>Compras</h4>
 {% if pedidos %}
 {% for pedido in pedidos %}
-<div class="row mb-1 border ">
-    <div class="d-flex justify-content-between">
+<div class="row mb-1 border-top ">
+    <div class="d-flex justify-content-between align-items-center">
         <p class="my-1">{{ pedido.pedido.fecha_pedido|date }}</p>
         <a class="btn btn-primary btn-sm my-1" href="{% url 'compra_detalle' pedido.pedido.id_pedido %}">Ver compra</a>
     </div>
-
     {% for pedido_detalle in pedido.pedido_detalle %}
     <div class="container">
     <div class="row border-top my-1 align-items-center">

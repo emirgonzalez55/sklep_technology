@@ -1,5 +1,29 @@
 {% extends "base/base.html" %}
 {% block titulo %} Inicio {% endblock %}
 {% block contenido %}  
+<div class="container shadow rounded bg-body-tertiary my-2">
+    <h4>Bienvenido a Sklep Technology</h4>
 
+</div>
+<div class="container shadow rounded bg-body-tertiary my-2">
+    <h5>Productos destacados</h5>
+    {% if productos %}
+    <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 my-2">
+        {% for producto in productos %}
+        <div class="col my-1">
+          <a href="{% url 'producto_detalle' producto.slug %}" class="text-decoration-none">
+            <div class="card" style="max-width: 223px; max-height: 403px;">
+              <img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100%" >
+              <div class="card-footer bg-transparent ">
+                <h6 class="text-truncate">{{ producto.producto_nombre }}</h6>
+                <span class="text-truncate">$ {{ producto.precio_unitario }}</span>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+</div>
 {% endblock %}

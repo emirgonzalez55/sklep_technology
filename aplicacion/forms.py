@@ -80,6 +80,6 @@ class MarcaForm(forms.ModelForm):
 class PagoForm(forms.Form):
     tarjeta_titular = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control",'placeholder':'Nombre del titular'}))
     dni = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control",'placeholder':'12345678',"maxlength": 8}),validators=[dni_valid])
-    tarjeta_numero = forms.IntegerField(widget=forms.TextInput(attrs={"class": "form-control",'placeholder':'1234 1234 1234 1234',"maxlength": 19}),validators=[tarjeta_valid])
+    tarjeta_numero = forms.IntegerField(widget=forms.TextInput(attrs={"class": "form-control",'placeholder':'1234 1234 1234 1234',"maxlength": 16}),validators=[tarjeta_valid])
     tarjeta_codigo = forms.IntegerField(widget=forms.TextInput(attrs={"class": "form-control",'placeholder':'123',"maxlength": 4}),validators=[tarjeta_codigo_valid])
-    tarjeta_fecha = forms.IntegerField(widget=forms.TextInput(attrs={"class": "form-control",'placeholder':'MM/AA',"maxlength": 5}),validators=[tarjeta_fecha_valid])
+    tarjeta_fecha = forms.IntegerField(widget=forms.TextInput(attrs={"class": "form-control",'placeholder':'MM/AA',"maxlength": 4}),validators=[tarjeta_fecha_valid])

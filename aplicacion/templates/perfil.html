@@ -11,10 +11,9 @@
             <h5>Email: {{ request.user.email }}</h5>
         </div>
     </div>
-    <div class="row d-flex justify-content-between border-top">
+    <div class="row d-flex justify-content-between align-items-center border-top">
         <div class="col-auto">
             <h5 class="my-1">Información</h5>
-
         </div>
         <div class="col-auto">
             <button class="btn btn-secondary btn-sm my-1" onclick="modal_perfil('/perfil/cambiar-password')">Cambiar contraseña</button>
@@ -23,18 +22,18 @@
     </div>
  
     <div class="container" id="tabla-perfil">
-    <div class="row justify-content-center my-1">
-        <div class="border-top my-1">
-            <h5>Usuario: {{ request.user.usuario }}</h5>
+    <div class="row justify-content-center align-items-center my-1">
+        <div class="border-top">
+            <p class="my-1">Usuario: {{ request.user.usuario }}</p>
         </div>
-        <div class="border-top my-1">
-            <h5>Email: {{ request.user.email }}</h5>
+        <div class="border-top">
+            <p class="my-1">Email: {{ request.user.email }}</p>
         </div>
-        <div class="border-top my-1">
-            <h5>Nombre: {{ request.user.nombre }}</h5>
+        <div class="border-top ">
+            <p class="my-1">Nombre: {{ request.user.nombre }}</p>
         </div>
-        <div class="border-top my-1">
-            <h5>Apellido: {{ request.user.apellido }}</h5>
+        <div class="border-top">
+            <p class="my-1">Apellido: {{ request.user.apellido }}</p>
         </div>
     </div>
 </div>
