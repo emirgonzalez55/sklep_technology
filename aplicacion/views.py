@@ -24,8 +24,7 @@ class InicioVista(ListView):
     template_name = "inicio.html"
     model = Producto
     context_object_name = "productos"
-    queryset = Producto.objects.all().order_by("producto_nombre")[:12]
-    print(queryset)
+    queryset = Producto.objects.all().order_by("producto_nombre")[:10]
 
 class RegistroVista(CreateView):
     template_name = "registro.html"
@@ -259,7 +258,7 @@ class AdministrarProductosEditarVista(PermissionRequiredMixin,UpdateView):
             response.status_code = 400
             return response
 class AdministrarProductosEliminarVista(PermissionRequiredMixin,DeleteView):
-    permission_required = 'aplicacion.delete_productos'
+    permission_required = 'aplicacion.delete_producto'
     template_name = "administrar_productos_eliminar.html"
     model = Producto
     success_url = reverse_lazy('administrar_productos')

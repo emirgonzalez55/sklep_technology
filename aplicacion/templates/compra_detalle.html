@@ -66,7 +66,7 @@
     <a href="{% url 'producto_detalle' pedido.producto.slug %}" class="link-body-emphasis text-decoration-none">
     <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center border-top justify-content-between mb-1 g-0">
         <div class="col-md-6 d-flex align-items-center">
-          <img src="{{ pedido.producto.imagen.url}}" alt="" class="img-fluid " width="100">
+          <img src="{{ pedido.producto.imagen.url}}" alt="" class="img-fluid " width="100" style="height: 80px;">
           <p class="text-truncate m-1">{{ pedido.producto.producto_nombre}}</p>
         </div>
         <div class="col-md-auto">

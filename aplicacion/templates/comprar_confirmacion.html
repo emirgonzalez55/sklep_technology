@@ -65,7 +65,7 @@
     {% for producto in productos %}
     <div class="row row-cols-1 row-cols-sm-1 row-cols-md-auto align-items-center d-flex border-top justify-content-between mb-1 g-0">
         <div class="col-md-6 d-flex align-items-center">
-            <img src="{{ producto.imagen.url}}" alt="" class="img-fluid " width="100">
+            <img src="{{ producto.imagen.url}}" alt="" class="img-fluid " width="100" style="height: 80px;">
             <p class="text-truncate m-1">{{ producto.producto_nombre}}</p>
         </div>
         <div class="col-md-auto">
@@ -85,4 +85,6 @@
     </div>
   </div>
 </div>
+{% load static %}
+<script src="{% static 'js/comprar.js' %}"></script> 
 {% endblock %}

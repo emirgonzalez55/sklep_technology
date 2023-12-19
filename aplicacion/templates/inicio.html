@@ -13,7 +13,7 @@
         <div class="col my-1">
           <a href="{% url 'producto_detalle' producto.slug %}" class="text-decoration-none">
             <div class="card" style="max-width: 223px; max-height: 403px;">
-              <img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100%" >
+              <img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100%" height="100%" style="height: 183px;">
               <div class="card-footer bg-transparent ">
                 <h6 class="text-truncate">{{ producto.producto_nombre }}</h6>
                 <span class="text-truncate">$ {{ producto.precio_unitario }}</span>

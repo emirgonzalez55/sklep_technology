@@ -31,13 +31,13 @@
     {% for producto in productos %}
       <tr>
         <th scope="row">{{ producto.id_producto }}</th>
-        <td><img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100"></td>
+        <td><img src="{{ producto.imagen.url }}" alt="" class="img-fluid" width="100%" height="100%" style="width: 100px; height: 100px;"></td>
         <td><a class="link-body-emphasis text-decoration-none" href="{% url 'producto_detalle' producto.slug %}">{{ producto.producto_nombre }}</a></td>
         <td>{{ producto.categoria }}</td>
         <td>$ {{ producto.precio_unitario }}</td>
         <td>{{ producto.unidades_stock }}</td>
         <td><button type="button" onclick="modal_producto('/administrar/productos/editar_producto/{{ producto.id_producto }}')" class="btn btn-secondary btn-sm">Editar</button></td>
-        {% if perms.aplicacion.delete_productos %}  
+        {% if perms.aplicacion.delete_producto %}  
         <td><button type="button" onclick="modal_producto('/administrar/productos/eliminar_producto/{{ producto.id_producto }}')" class="btn btn-danger btn-sm">Eliminar</button></td>
         {% endif %}
       </tr>
@@ -85,5 +85,6 @@
     </div>
   </div>
 </div>
-
+{% load static %}
+<script src="{% static 'js/productos.js' %}"></script> 
 {% endblock %}

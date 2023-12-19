@@ -672,7 +672,7 @@ class PedidoPreferencia(models.Model):
                 for interes in intereses:
                     cuotas = interes["cuotas"]
                     interes = interes["interes"]
-                    print(type(interes),type(cuotas),type(total))
+                    # print(type(interes),type(cuotas),type(total))
                     total_interes = str(round(Decimal(total * interes),2))
                     total_cuota = str(round(Decimal(total * interes/cuotas),2))
                     tarjeta_cuotas.append({ "cuotas": cuotas, "total_cuota": total_cuota ,"total_interes": total_interes})
@@ -696,10 +696,10 @@ class PedidoPreferencia(models.Model):
     def eliminar_preferencia(id_preferencia):
         try:
             preferencia = PedidoPreferencia.objects.get(id_preferencia=id_preferencia)
-            print("esta es la preferencia que se va a borrar",preferencia)
+            # print("esta es la preferencia que se va a borrar",preferencia)
             preferencia.delete()
         except ObjectDoesNotExist:
-            print("la preferencia no existe")
+            # print("la preferencia no existe")
             pass
 
 @receiver(pre_save)

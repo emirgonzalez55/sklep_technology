@@ -11,7 +11,7 @@
                     </div>
                     <div class="col">
                         <div class="card-body">
-                        <h4 class="card-title text-truncate">{{ producto.producto_nombre }}</h4>
+                        <h4 class="card-title">{{ producto.producto_nombre }}</h4>
                         <p class="card-text">$ {{ producto.precio_unitario }}</p>
                         {% if producto.categoria %}
                         <p class="card-text">Categoría: <a href="{% url 'productos_filtro' 'categoria' producto.categoria.slug %}">{{ producto.categoria }}</a></p>
@@ -79,4 +79,6 @@
     </div>
     </div>
 </div>
+{% load static %}
+<script src="{% static 'js/comprar.js' %}"></script> 
 {% endblock %}
