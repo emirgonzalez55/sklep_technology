@@ -6,11 +6,11 @@ from django.core.validators import RegexValidator
 from .models import Usuario, Producto, ProductoCategoria,ProductoMarca
 from django.contrib.auth.models import Group
 
-string_valid = RegexValidator(regex="^(?=.*[A-Z])(?=.*[a-z])(?=.*[\d])[\w]{4,20}$")
-tarjeta_valid = RegexValidator(regex="^\d{15,16}$",message="Longitud minima 15/maxima 16",code="")
-tarjeta_codigo_valid = RegexValidator(regex="^\d{3,4}$",message="Longitud minima 3/maxima 4",code="")
-tarjeta_fecha_valid = RegexValidator(regex="^\d{4,4}$",message="Longitud minima 4/maxima 4",code="")
-dni_valid = RegexValidator(regex="^\d{1,8}$",message="Longitud minima 1/maxima 8",code="")
+string_valid = RegexValidator(regex=r"^(?=.*[A-Z])(?=.*[a-z])(?=.*[\d])[\w]{4,20}$")
+tarjeta_valid = RegexValidator(regex=r"^\d{15,16}$",message="Longitud minima 15/maxima 16",code="")
+tarjeta_codigo_valid = RegexValidator(regex=r"^\d{3,4}$",message="Longitud minima 3/maxima 4",code="")
+tarjeta_fecha_valid = RegexValidator(regex=r"^\d{4,4}$",message="Longitud minima 4/maxima 4",code="")
+dni_valid = RegexValidator(regex=r"^\d{1,8}$",message="Longitud minima 1/maxima 8",code="")
  
 class RegistroForm(UserCreationForm):
     class Meta:
